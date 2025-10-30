@@ -1,0 +1,70 @@
+
+<div class="container mx-auto animate-fade-in">
+    <!-- Header -->
+    <div class="mb-6">
+        <h3 class="text-2xl font-semibold text-gray-700 dark:text-gray-200">Registro de Pagos y Rendición</h3>
+        <p class="text-gray-500 dark:text-gray-400 mt-1">Registre los pagos de cupones y calcule las comisiones de los cobradores.</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Cupones por Cobrar -->
+        <div>
+            <h4 class="text-lg font-medium text-gray-800 dark:text-gray-200 mb-4">Cupones Pendientes de Pago</h4>
+             <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                            <tr>
+                                <th scope="col" class="px-6 py-3">Socio</th>
+                                <th scope="col" class="px-6 py-3">Importe</th>
+                                <th scope="col" class="px-6 py-3">Cobrador</th>
+                                <th scope="col" class="px-6 py-3 text-right">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (cupon of cuponesImpagos(); track cupon.id) {
+                            <tr class="bg-white dark:bg-gray-800 border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">{{ cupon.nombreSocio }}</td>
+                                <td class="px-6 py-4">${{ cupon.importeTotal }}</td>
+                                <td class="px-6 py-4">{{ cupon.cobrador }}</td>
+                                <td class="px-6 py-4 text-right">
+                                    <button (click)="registrarPago(cupon)" class="font-medium text-green-600 dark:text-green-500 hover:underline">Registrar Pago</button>
+                                </td>
+                            </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pagos Registrados -->
+        <div>
+            <h4 class="text-lg font-medium text-gray-800 dark:text-gray-200 mb-4">Últimos Pagos Registrados</h4>
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                         <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                            <tr>
+                                <th scope="col" class="px-6 py-3">Fecha</th>
+                                <th scope="col" class="px-6 py-3">Importe</th>
+                                <th scope="col" class="px-6 py-3">Comisión</th>
+                                <th scope="col" class="px-6 py-3">Cobrador</th>
+                            </tr>
+                        </thead>
+                         <tbody>
+                            @for (pago of pagos(); track pago.id) {
+                            <tr class="bg-white dark:bg-gray-800 border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                <td class="px-6 py-4">{{ pago.fechaPago }}</td>
+                                <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">${{ pago.importePagado }}</td>
+                                <td class="px-6 py-4 text-green-600">${{ pago.comisionCobrador }}</td>
+                                <td class="px-6 py-4">{{ pago.cobrador }}</td>
+                            </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

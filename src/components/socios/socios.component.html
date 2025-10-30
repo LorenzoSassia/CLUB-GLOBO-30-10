@@ -1,0 +1,211 @@
+<div class="container mx-auto animate-fade-in">
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-800 dark:text-white">Gestión de Socios</h1>
+      <p class="text-gray-500 dark:text-gray-400 mt-1">Busque, ordene y administre el registro de socios del club.</p>
+    </div>
+    <button (click)="abrirModal(null)" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-5 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center space-x-2">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+      <span>Nuevo Socio</span>
+    </button>
+  </div>
+  
+  <!-- Stats -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg flex items-center space-x-4">
+       <div class="bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 rounded-full p-3">
+        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+       </div>
+       <div>
+         <p class="text-sm text-gray-500 dark:text-gray-400">Total de Socios</p>
+         <p class="text-2xl font-bold text-gray-800 dark:text-white">{{ estadisticas().total }}</p>
+       </div>
+     </div>
+     <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg flex items-center space-x-4">
+        <div class="bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-400 rounded-full p-3">
+            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        </div>
+       <div>
+         <p class="text-sm text-gray-500 dark:text-gray-400">Socios al Día</p>
+         <p class="text-2xl font-bold text-gray-800 dark:text-white">{{ estadisticas().alDia }}</p>
+       </div>
+     </div>
+     <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg flex items-center space-x-4">
+        <div class="bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400 rounded-full p-3">
+             <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
+        </div>
+       <div>
+         <p class="text-sm text-gray-500 dark:text-gray-400">Socios Morosos</p>
+         <p class="text-2xl font-bold text-gray-800 dark:text-white">{{ estadisticas().morosos }}</p>
+       </div>
+     </div>
+  </div>
+
+  <!-- Table -->
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+    <div class="p-4 border-b dark:border-gray-700">
+        <input type="text" [value]="filtro()" (input)="actualizarFiltro($event)" placeholder="Buscar por nombre y apellido..."
+         class="block w-full max-w-sm px-4 py-2 text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-300">
+          <tr>
+            <th scope="col" class="px-6 py-3 cursor-pointer" (click)="cambiarSort('id')">
+              ID @if(sortColumn() === 'id'){<span>{{ sortDirection() === 'asc' ? '▲' : '▼' }}</span>}
+            </th>
+            <th scope="col" class="px-6 py-3 cursor-pointer" (click)="cambiarSort('nombreCompleto')">
+              Nombre Completo @if(sortColumn() === 'nombreCompleto'){<span>{{ sortDirection() === 'asc' ? '▲' : '▼' }}</span>}
+            </th>
+            <th scope="col" class="px-6 py-3 cursor-pointer" (click)="cambiarSort('nombreCategoria')">
+              Categoría @if(sortColumn() === 'nombreCategoria'){<span>{{ sortDirection() === 'asc' ? '▲' : '▼' }}</span>}
+            </th>
+            <th scope="col" class="px-6 py-3">Teléfono</th>
+            <th scope="col" class="px-6 py-3 cursor-pointer" (click)="cambiarSort('moroso')">
+              Estado @if(sortColumn() === 'moroso'){<span>{{ sortDirection() === 'asc' ? '▲' : '▼' }}</span>}
+            </th>
+            <th scope="col" class="px-6 py-3 text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (socio of sociosPaginados(); track socio.id) {
+            <tr class="bg-white dark:bg-gray-800 border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+              <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">{{ socio.id }}</td>
+              <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">{{ socio.nombreCompleto }}</td>
+              <td class="px-6 py-4">{{ socio.nombreCategoria }}</td>
+              <td class="px-6 py-4">{{ socio.telefono }}</td>
+              <td class="px-6 py-4">
+                @if(socio.moroso) {
+                  <span class="px-2.5 py-1 text-xs font-semibold text-red-800 bg-red-100 dark:bg-red-900 dark:text-red-300 rounded-full">Moroso</span>
+                } @else {
+                  <span class="px-2.5 py-1 text-xs font-semibold text-green-800 bg-green-100 dark:bg-green-900 dark:text-green-300 rounded-full">Al día</span>
+                }
+              </td>
+              <td class="px-6 py-4 text-right">
+                <button (click)="abrirModal(socio)" class="font-medium text-blue-600 dark:text-blue-500 hover:underline mr-4">Editar</button>
+                <button (click)="iniciarEliminacion(socio)" class="font-medium text-red-600 dark:text-red-500 hover:underline">Eliminar</button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+                <td colspan="6" class="px-6 py-12 text-center text-gray-500">
+                    <p class="text-lg">No se encontraron socios.</p>
+                    <p class="text-sm">Intente ajustar su búsqueda o agregue un nuevo socio.</p>
+                </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+     <!-- Pagination -->
+    <div class="px-4 py-3 flex items-center justify-between border-t dark:border-gray-700">
+        <span class="text-sm text-gray-700 dark:text-gray-400">
+            Página {{ paginaActual() }} de {{ totalPaginas() }}
+        </span>
+        <div class="inline-flex rounded-md shadow-sm" role="group">
+            <button (click)="cambiarPagina(paginaActual() - 1)" [disabled]="paginaActual() === 1" class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-l-lg hover:bg-gray-100 disabled:opacity-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600">
+                Anterior
+            </button>
+            <button (click)="cambiarPagina(paginaActual() + 1)" [disabled]="paginaActual() === totalPaginas()" class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b border-r border-gray-200 rounded-r-lg hover:bg-gray-100 disabled:opacity-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600">
+                Siguiente
+            </button>
+        </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for Add/Edit Socio -->
+@if (modalAbierto()) {
+  <div class="fixed inset-0 bg-black bg-opacity-60 z-40" (click)="cerrarModal()"></div>
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col" (click)="$event.stopPropagation()">
+      <div class="px-6 py-4 border-b dark:border-gray-700">
+        <h2 class="text-xl font-semibold text-gray-800 dark:text-white">{{ socioEditando() ? 'Editar Socio' : 'Nuevo Socio' }}</h2>
+      </div>
+      <form [formGroup]="formularioSocio" (ngSubmit)="guardarSocio()" class="flex-1 overflow-y-auto p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          <div>
+            <label for="nombre" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre</label>
+            <input type="text" id="nombre" formControlName="nombre" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:ring-blue-500 focus:border-blue-500">
+          </div>
+          <div>
+            <label for="apellido" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Apellido</label>
+            <input type="text" id="apellido" formControlName="apellido" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:ring-blue-500 focus:border-blue-500">
+          </div>
+           <div>
+            <label for="dni" class="block text-sm font-medium text-gray-700 dark:text-gray-300">DNI</label>
+            <input type="text" id="dni" formControlName="dni" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:ring-blue-500 focus:border-blue-500">
+          </div>
+           <div>
+            <label for="fechaNacimiento" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Fecha de Nacimiento</label>
+            <input type="date" id="fechaNacimiento" formControlName="fechaNacimiento" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:ring-blue-500 focus:border-blue-500">
+          </div>
+          <div class="md:col-span-2">
+            <label for="direccion" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Dirección</label>
+            <input type="text" id="direccion" formControlName="direccion" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:ring-blue-500 focus:border-blue-500">
+          </div>
+           <div>
+            <label for="telefono" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Teléfono</label>
+            <input type="text" id="telefono" formControlName="telefono" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:ring-blue-500 focus:border-blue-500">
+          </div>
+           <div>
+            <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
+            <input type="email" id="email" formControlName="email" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:ring-blue-500 focus:border-blue-500">
+          </div>
+          <div>
+            <label for="idCategoria" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Categoría</label>
+            <select id="idCategoria" formControlName="idCategoria" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:ring-blue-500 focus:border-blue-500">
+                <option [value]="0" disabled>Seleccione una categoría...</option>
+                @for (cat of categorias(); track cat.id) { <option [value]="cat.id">{{ cat.nombre }}</option> }
+            </select>
+          </div>
+          <div>
+            <label for="idZona" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Zona</label>
+            <select id="idZona" formControlName="idZona" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:ring-blue-500 focus:border-blue-500">
+                 <option [value]="0" disabled>Seleccione una zona...</option>
+                 @for (zona of zonas(); track zona.id) { <option [value]="zona.id">{{ zona.nombre }}</option> }
+            </select>
+          </div>
+
+        </div>
+      </form>
+      <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 flex justify-end space-x-3 rounded-b-lg">
+        <button type="button" (click)="cerrarModal()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500">Cancelar</button>
+        <button type="button" (click)="guardarSocio()" [disabled]="formularioSocio.invalid" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-blue-300 dark:disabled:bg-blue-400 disabled:cursor-not-allowed">Guardar Socio</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal for Delete Confirmation -->
+@if (modalEliminarAbierto() && socioParaEliminar(); as socio) {
+  <div class="fixed inset-0 bg-black bg-opacity-60 z-40" (click)="cancelarEliminacion()"></div>
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md" (click)="$event.stopPropagation()">
+      <div class="p-6 text-center">
+        <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900/50">
+          <svg class="h-6 w-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+          </svg>
+        </div>
+        <h3 class="mt-5 text-lg font-medium text-gray-900 dark:text-white">Eliminar Socio</h3>
+        <div class="mt-2">
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            ¿Está seguro que desea eliminar a <strong class="text-gray-700 dark:text-gray-200">{{ socio.nombreCompleto }}</strong>?
+          </p>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Esta acción no se puede deshacer.</p>
+        </div>
+      </div>
+      <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 flex justify-center space-x-3 rounded-b-lg">
+        <button type="button" (click)="cancelarEliminacion()" class="px-4 py-2 w-full bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500">
+          Cancelar
+        </button>
+        <button type="button" (click)="confirmarEliminacion()" class="px-4 py-2 w-full bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+          Sí, Eliminar
+        </button>
+      </div>
+    </div>
+  </div>
+}

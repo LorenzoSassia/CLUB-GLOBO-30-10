@@ -1,0 +1,248 @@
+<div class="animate-fade-in">
+  <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    @if (socio(); as s) {
+      <!-- Welcome Header -->
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-800 dark:text-white">Bienvenido, {{ s.nombre }}</h1>
+        <p class="mt-1 text-lg text-gray-600 dark:text-gray-400">Aquí puedes consultar tu información, cupones y actividades.</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Left Column: Personal Info & Locker -->
+        <div class="lg:col-span-1 space-y-8">
+          <!-- Personal Info Card -->
+          <div class="bg-gray-50 dark:bg-gray-800/50 p-6 rounded-xl shadow">
+            <div class="flex items-center space-x-3 border-b border-gray-200 dark:border-gray-700 pb-3 mb-4">
+              <div class="bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 rounded-full p-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+              </div>
+              <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Mis Datos</h2>
+            </div>
+            <div class="space-y-3 text-gray-700 dark:text-gray-300">
+              <p><strong>Nombre:</strong> {{ s.nombre }} {{ s.apellido }}</p>
+              <p><strong>Email:</strong> {{ s.email }}</p>
+              <p><strong>Teléfono:</strong> {{ s.telefono }}</p>
+              <p><strong>Categoría:</strong> {{ categoria()?.nombre || 'N/A' }}</p>
+              <p><strong>Antigüedad:</strong> {{ s.antiguedad }} años</p>
+              <div class="flex items-center">
+                <strong class="mr-2">Estado:</strong> 
+                <span class="font-semibold px-2 py-1 text-sm rounded-full" [class.text-red-800]="s.moroso" [class.bg-red-100]="s.moroso" [class.dark:text-red-200]="s.moroso" [class.dark:bg-red-900/50]="s.moroso" [class.text-green-800]="!s.moroso" [class.bg-green-100]="!s.moroso" [class.dark:text-green-200]="!s.moroso" [class.dark:bg-green-900/50]="!s.moroso">
+                  {{ s.moroso ? 'Moroso' : 'Al día' }}
+                </span>
+              </div>
+            </div>
+          </div>
+          <!-- Locker Card -->
+          <div class="bg-gray-50 dark:bg-gray-800/50 p-6 rounded-xl shadow">
+            <div class="flex items-center space-x-3 border-b border-gray-200 dark:border-gray-700 pb-3 mb-4">
+              <div class="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 rounded-full p-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
+              </div>
+              <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Mi Casillero</h2>
+            </div>
+            @if (casillero(); as c) {
+              <div class="space-y-2 text-gray-700 dark:text-gray-300">
+                <p><strong>Número:</strong> <span class="font-mono text-lg">{{ c.id }}</span></p>
+                <p><strong>Costo Alquiler:</strong> {{ c.costoAlquiler | currency:'':'$':'1.2-2' }}</p>
+                <p><strong>Estado:</strong> {{ c.estado }}</p>
+              </div>
+            } @else {
+              <p class="text-gray-500 dark:text-gray-400 mb-4">No tienes un casillero asignado.</p>
+              <button (click)="abrirModalCasillerosDisponibles()" class="w-full px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 shadow-md transition-transform transform hover:scale-105">
+                Ver Casilleros Disponibles
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Right Column: Coupons & Activities -->
+        <div class="lg:col-span-2 space-y-8">
+          <!-- Coupons History -->
+          <div class="bg-gray-50 dark:bg-gray-800/50 rounded-xl shadow overflow-hidden">
+            <div class="p-6 border-b border-gray-200 dark:border-gray-700 flex items-center space-x-3">
+              <div class="bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-400 rounded-full p-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              </div>
+              <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Historial de Cupones</h2>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm text-left text-gray-600 dark:text-gray-400">
+                <thead class="text-xs text-gray-700 dark:text-gray-300 uppercase bg-gray-100 dark:bg-gray-700/50">
+                  <tr>
+                    <th scope="col" class="px-6 py-3">Período</th>
+                    <th scope="col" class="px-6 py-3">Vencimiento</th>
+                    <th scope="col" class="px-6 py-3 text-right">Importe</th>
+                    <th scope="col" class="px-6 py-3 text-center">Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (cupon of cupones(); track cupon.id) {
+                    <tr class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700/50">
+                      <td class="px-6 py-4 font-medium text-gray-800 dark:text-gray-200">{{ cupon.mes }}/{{ cupon.anio }}</td>
+                      <td class="px-6 py-4">{{ cupon.fechaVencimiento | date:'dd/MM/yyyy' }}</td>
+                      <td class="px-6 py-4 text-right font-mono text-gray-800 dark:text-gray-200">{{ cupon.importeTotal | currency:'':'$':'1.2-2' }}</td>
+                      <td class="px-6 py-4 text-center">
+                        <span class="px-2.5 py-1 text-xs font-semibold rounded-full"
+                          [class.bg-green-100]="cupon.estado === 'Pagado'" [class.text-green-800]="cupon.estado === 'Pagado'" [class.dark:bg-green-900/50]="cupon.estado === 'Pagado'" [class.dark:text-green-300]="cupon.estado === 'Pagado'"
+                          [class.bg-red-100]="cupon.estado === 'Vencido'" [class.text-red-800]="cupon.estado === 'Vencido'" [class.dark:bg-red-900/50]="cupon.estado === 'Vencido'" [class.dark:text-red-300]="cupon.estado === 'Vencido'"
+                          [class.bg-yellow-100]="cupon.estado === 'Impago'" [class.text-yellow-800]="cupon.estado === 'Impago'" [class.dark:bg-yellow-900/50]="cupon.estado === 'Impago'" [class.dark:text-yellow-300]="cupon.estado === 'Impago'">
+                          {{ cupon.estado }}
+                        </span>
+                      </td>
+                    </tr>
+                  } @empty {
+                    <tr><td colspan="4" class="text-center p-6 text-gray-500">No hay cupones para mostrar.</td></tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <!-- Activities -->
+          <div class="bg-gray-50 dark:bg-gray-800/50 rounded-xl shadow overflow-hidden">
+            <div class="p-6 border-b border-gray-200 dark:border-gray-700 flex items-center space-x-3">
+              <div class="bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400 rounded-full p-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+              </div>
+              <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Gestionar Actividades</h2>
+            </div>
+            @if (s.moroso) {
+              <div class="p-6 text-center text-yellow-800 dark:text-yellow-200 bg-yellow-50 dark:bg-yellow-900/50">
+                <p>Debes estar al día para inscribirte o darte de baja de actividades.</p>
+              </div>
+            }
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm text-left text-gray-600 dark:text-gray-400">
+                <thead class="text-xs text-gray-700 dark:text-gray-300 uppercase bg-gray-100 dark:bg-gray-700/50">
+                  <tr>
+                    <th scope="col" class="px-6 py-3">Actividad</th>
+                    <th scope="col" class="px-6 py-3">Horario</th>
+                    <th scope="col" class="px-6 py-3 text-right">Costo Mensual</th>
+                    <th scope="col" class="px-6 py-3 text-center">Acción</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (act of actividadesDisponibles(); track act.id) {
+                    <tr class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700/50">
+                      <td class="px-6 py-4 font-medium text-gray-800 dark:text-gray-200">{{ act.nombre }}</td>
+                      <td class="px-6 py-4">{{ act.horario }}</td>
+                      <td class="px-6 py-4 text-right font-mono text-gray-800 dark:text-gray-200">{{ act.costo | currency:'':'$':'1.2-2' }}</td>
+                      <td class="px-6 py-4 text-center">
+                        @if (act.inscrito) {
+                          <button (click)="iniciarBaja(act)" [disabled]="tieneFacturaImpaga()" class="text-xs font-semibold text-white bg-red-500 hover:bg-red-600 px-3 py-1.5 rounded-full transition-colors disabled:bg-red-300 dark:disabled:bg-red-800 disabled:cursor-not-allowed" [title]="tieneFacturaImpaga() ? 'Debe pagar su cuota para darse de baja' : ''">Darse de Baja</button>
+                        } @else {
+                          <button (click)="inscribir(act.id)" [disabled]="s.moroso" class="text-xs font-semibold text-white bg-green-500 hover:bg-green-600 px-3 py-1.5 rounded-full transition-colors disabled:bg-green-300 dark:disabled:bg-green-800 disabled:cursor-not-allowed">Inscribirse</button>
+                        }
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    } @else {
+      <div class="text-center py-20">
+        <p class="text-xl text-gray-600 dark:text-gray-400">No se pudieron cargar los datos del socio.</p>
+      </div>
+    }
+  </main>
+
+  <!-- Baja Confirmation Modal -->
+  @if (modalConfirmacionAbierto() && actividadParaBaja(); as act) {
+    <div class="fixed inset-0 bg-black bg-opacity-60 z-40" (click)="cancelarBaja()"></div>
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md" (click)="$event.stopPropagation()">
+        <div class="p-6 text-center">
+          <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900/50">
+            <svg class="h-6 w-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+            </svg>
+          </div>
+          <h3 class="mt-5 text-lg font-medium text-gray-900 dark:text-white">Confirmar Baja</h3>
+          <div class="mt-2">
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+              ¿Está seguro que desea darse de baja de la actividad <strong class="text-gray-700 dark:text-gray-200">{{ act.nombre }}</strong>?
+            </p>
+          </div>
+        </div>
+        <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 flex justify-center space-x-3 rounded-b-lg">
+          <button type="button" (click)="cancelarBaja()" class="px-4 py-2 w-full bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500">
+            Cancelar
+          </button>
+          <button type="button" (click)="confirmarBaja()" class="px-4 py-2 w-full bg-red-600 text-white rounded-md hover:bg-red-700">
+            Sí, dar de Baja
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Rental Confirmation Modal -->
+  @if (modalAlquilerAbierto() && casilleroParaAlquilar(); as cas) {
+    <div class="fixed inset-0 bg-black bg-opacity-60 z-40" (click)="cancelarAlquiler()"></div>
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md" (click)="$event.stopPropagation()">
+        <div class="p-6 text-center">
+          <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 dark:bg-blue-900/50">
+            <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
+          </div>
+          <h3 class="mt-5 text-lg font-medium text-gray-900 dark:text-white">Confirmar Alquiler</h3>
+          <div class="mt-2">
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+              ¿Desea alquilar el casillero <strong class="text-gray-700 dark:text-gray-200">N° {{ cas.id }}</strong> por un costo de <strong class="text-gray-700 dark:text-gray-200">{{ cas.costoAlquiler | currency:'':'$':'1.2-2' }}</strong> mensuales?
+            </p>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">El costo se agregará a su próximo cupón de pago.</p>
+          </div>
+        </div>
+        <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 flex justify-center space-x-3 rounded-b-lg">
+          <button type="button" (click)="cancelarAlquiler()" class="px-4 py-2 w-full bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500">
+            Cancelar
+          </button>
+          <button type="button" (click)="confirmarAlquiler()" class="px-4 py-2 w-full bg-blue-600 text-white rounded-md hover:bg-blue-700">
+            Sí, Alquilar
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Available Lockers Modal -->
+  @if (modalCasillerosDisponiblesAbierto()) {
+    <div class="fixed inset-0 bg-black bg-opacity-60 z-40" (click)="cerrarModalCasillerosDisponibles()"></div>
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-lg max-h-[90vh] flex flex-col" (click)="$event.stopPropagation()">
+        <div class="px-6 py-4 border-b dark:border-gray-700 flex justify-between items-center">
+          <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Alquilar un Casillero</h3>
+           <button (click)="cerrarModalCasillerosDisponibles()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+           </button>
+        </div>
+        <div class="flex-1 overflow-y-auto p-6">
+          @if (casillerosDisponibles().length > 0) {
+            <div class="space-y-3">
+              @for (cas of casillerosDisponibles(); track cas.id) {
+                <div class="flex items-center justify-between bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg">
+                  <div>
+                    <p class="font-semibold text-gray-800 dark:text-gray-200">Casillero N° {{ cas.id }}</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ cas.costoAlquiler | currency:'':'$':'1.2-2' }} / mes</p>
+                  </div>
+                  <button (click)="iniciarAlquiler(cas)" [disabled]="socio()?.moroso" class="px-4 py-2 text-sm font-semibold text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors disabled:bg-blue-300 dark:disabled:bg-blue-800 disabled:cursor-not-allowed">
+                    Alquilar
+                  </button>
+                </div>
+              }
+            </div>
+          } @else {
+            <p class="text-center text-gray-500 dark:text-gray-400 py-8">No hay casilleros disponibles en este momento.</p>
+          }
+        </div>
+         <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 flex justify-end rounded-b-lg">
+          <button type="button" (click)="cerrarModalCasillerosDisponibles()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500">
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

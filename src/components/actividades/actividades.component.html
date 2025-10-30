@@ -1,0 +1,106 @@
+
+
+<div class="container mx-auto animate-fade-in">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h3 class="text-2xl font-semibold text-gray-700 dark:text-gray-200">Gestión de Actividades</h3>
+            <p class="text-gray-500 dark:text-gray-400 mt-1">Administre las actividades deportivas del club.</p>
+        </div>
+        <button (click)="abrirModal(null)" class="px-6 py-2.5 bg-blue-600 text-white font-medium text-sm rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-all duration-300 ease-in-out shadow-md hover:shadow-lg flex items-center">
+             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+            Agregar Actividad
+        </button>
+    </div>
+
+    <!-- Table -->
+     <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                    <tr>
+                        <th scope="col" class="px-6 py-3">Nombre</th>
+                        <th scope="col" class="px-6 py-3">Costo Mensual</th>
+                        <th scope="col" class="px-6 py-3">Turno</th>
+                        <th scope="col" class="px-6 py-3 text-right">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (act of actividades(); track act.id) {
+                    <tr class="bg-white dark:bg-gray-800 border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                        <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">{{ act.nombre }}</td>
+                        <td class="px-6 py-4">${{ act.costo }}</td>
+                        <td class="px-6 py-4">{{ act.turno }}</td>
+                        <td class="px-6 py-4 text-right">
+                            <button (click)="abrirModal(act)" class="font-medium text-blue-600 dark:text-blue-500 hover:underline mr-4">Editar</button>
+                            <button (click)="iniciarEliminacion(act)" class="font-medium text-red-600 dark:text-red-500 hover:underline">Eliminar</button>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Add/Edit Modal -->
+@if (modalAbierto()) {
+    <div class="fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-lg m-4" (click)="$event.stopPropagation()">
+            <form [formGroup]="formularioActividad" (ngSubmit)="guardarActividad()">
+                <div class="px-6 py-4 border-b dark:border-gray-700">
+                    <h3 class="text-xl font-semibold text-gray-800 dark:text-white">{{ actividadEditando() ? 'Editar Actividad' : 'Nueva Actividad' }}</h3>
+                </div>
+                <div class="p-6 space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre</label>
+                        <input type="text" formControlName="nombre" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Costo Mensual</label>
+                        <input type="number" formControlName="costo" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+                    </div>
+                     <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Turno</label>
+                        <input type="text" formControlName="turno" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200" placeholder="Ej: Mañana, Tarde, Noche, Mañana - Tarde">
+                    </div>
+                </div>
+                <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 flex justify-end space-x-3">
+                    <button type="button" (click)="cerrarModal()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Cancelar</button>
+                    <button type="submit" [disabled]="formularioActividad.invalid" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+}
+
+<!-- Delete Confirmation Modal -->
+@if (modalEliminarAbierto() && actividadParaEliminar(); as actividad) {
+  <div class="fixed inset-0 bg-black bg-opacity-60 z-40" (click)="cancelarEliminacion()"></div>
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md" (click)="$event.stopPropagation()">
+      <div class="p-6 text-center">
+        <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900/50">
+          <svg class="h-6 w-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+          </svg>
+        </div>
+        <h3 class="mt-5 text-lg font-medium text-gray-900 dark:text-white">Eliminar Actividad</h3>
+        <div class="mt-2">
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            ¿Está seguro que desea eliminar la actividad <strong class="text-gray-700 dark:text-gray-200">{{ actividad.nombre }}</strong>?
+          </p>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Esta acción no se puede deshacer.</p>
+        </div>
+      </div>
+      <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 flex justify-center space-x-3 rounded-b-lg">
+        <button type="button" (click)="cancelarEliminacion()" class="px-4 py-2 w-full bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500">
+          Cancelar
+        </button>
+        <button type="button" (click)="confirmarEliminacion()" class="px-4 py-2 w-full bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+          Sí, Eliminar
+        </button>
+      </div>
+    </div>
+  </div>
+}

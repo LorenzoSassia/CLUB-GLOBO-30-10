@@ -1,0 +1,5 @@
+{
+  "name": "Club El Globo Management System",
+  "description": "A web application for managing members, activities, lockers, and billing for Club El Globo, as per the provided project specifications. This system is designed for Administrator/Staff use.",
+  "requestFramePermissions": []
+}

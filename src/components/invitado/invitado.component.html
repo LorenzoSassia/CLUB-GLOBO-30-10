@@ -1,0 +1,109 @@
+<div class="animate-fade-in space-y-16 md:space-y-24 pb-16">
+  
+  <!-- Hero Section -->
+  <section class="relative h-[60vh] -mt-8 -mx-8 flex items-center justify-center text-center text-white bg-cover bg-center" style="background-image: url('https://picsum.photos/seed/club/1600/900');">
+    <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+    <div class="relative z-10 p-4">
+      <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight">Únete a la Familia de El Globo</h1>
+      <p class="mt-4 text-lg md:text-xl max-w-3xl mx-auto">
+        Donde el deporte, la amistad y el bienestar se unen para crear experiencias inolvidables.
+      </p>
+      <div class="mt-8">
+        <a routerLink="/login" class="px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 shadow-lg transition-transform transform hover:scale-105 text-lg">
+          Conviértete en Socio
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Us Section -->
+  <section class="container mx-auto px-4">
+    <div class="grid md:grid-cols-2 gap-12 items-center">
+      <div class="prose prose-lg dark:prose-invert max-w-none">
+        <h2 class="text-3xl font-bold text-gray-800 dark:text-white">Más que un Club, una Comunidad</h2>
+        <p>
+          Fundado en 1950, el Club El Globo ha sido el corazón de nuestra comunidad por más de 70 años. Nuestra misión es ofrecer un espacio seguro y acogedor donde socios de todas las edades puedan desarrollar sus pasiones, mejorar su salud y forjar amistades duraderas.
+        </p>
+        <p>
+          Con instalaciones de primer nivel y un equipo de profesionales dedicados, estamos comprometidos con tu bienestar y el de tu familia.
+        </p>
+      </div>
+      <div>
+        <img src="https://picsum.photos/seed/community/600/400" alt="Miembros del club sonriendo" class="rounded-xl shadow-2xl w-full h-auto object-cover">
+      </div>
+    </div>
+  </section>
+
+  <!-- Gallery/Carousel Section -->
+  <section class="container mx-auto px-4">
+    <h2 class="text-3xl font-bold text-center text-gray-800 dark:text-white mb-8">Nuestras Instalaciones</h2>
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+      <!-- Main Image -->
+      <div class="relative">
+        <img [src]="imagenSeleccionada().src" [alt]="imagenSeleccionada().alt" class="w-full h-96 object-cover transition-opacity duration-300">
+        <div class="absolute bottom-0 left-0 bg-black bg-opacity-50 text-white p-4 w-full">
+            <h3 class="text-xl font-semibold">{{ imagenSeleccionada().caption }}</h3>
+        </div>
+      </div>
+      <!-- Thumbnails -->
+      <div class="grid grid-cols-4">
+        @for (imagen of imagenesGaleria(); track imagen.src; let i = $index) {
+          <button (click)="seleccionarImagen(i)" 
+                  class="relative aspect-video focus:outline-none group"
+                  [class.opacity-50]="imagenSeleccionadaIndex() !== i"
+                  [class.hover:opacity-100]="imagenSeleccionadaIndex() !== i">
+            <img [src]="imagen.src" [alt]="imagen.alt" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-blue-600 bg-opacity-0 group-hover:bg-opacity-25 transition-all duration-300"
+                 [class.bg-opacity-0]="imagenSeleccionadaIndex() !== i"
+                 [class.ring-4]="imagenSeleccionadaIndex() === i"
+                 [class.ring-blue-500]="imagenSeleccionadaIndex() === i"
+                 [class.z-10]="imagenSeleccionadaIndex() === i">
+            </div>
+          </button>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Activities Section -->
+  <section class="container mx-auto px-4">
+    <h2 class="text-3xl font-bold text-center text-gray-800 dark:text-white mb-8">Actividades para Todos</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+      @for(actividad of actividades(); track actividad.id) {
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 text-center transform hover:-translate-y-2 transition-transform duration-300 flex flex-col items-center">
+            <div class="text-blue-500 mb-4">
+                <!-- Simple icon logic based on activity name -->
+                @if (actividad.nombre.toLowerCase().includes('natación')) {
+                    <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h.5A2.5 2.5 0 0021.5 5.5V3.935m-18 0A2.5 2.5 0 015.5 2h.086a2 2 0 012.006 1.512l.713 2.852a2 2 0 01-1.785 2.45l-1.11.278a2 2 0 00-1.785 2.45l.713 2.852A2 2 0 015.586 18H5.5a2.5 2.5 0 01-2.445-2.065m18 0A2.5 2.5 0 0018.5 18h-.086a2 2 0 01-2.006-1.512l-.713-2.852a2 2 0 011.785-2.45l1.11-.278a2 2 0 001.785-2.45l-.713-2.852A2 2 0 0118.414 2H18.5a2.5 2.5 0 012.445 1.935z"></path></svg>
+                } @else if (actividad.nombre.toLowerCase().includes('fútbol')) {
+                     <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.586 15.086a2 2 0 01-2.828 0L6 10.314a2 2 0 010-2.828l5.758-5.758a2 2 0 012.828 0l5.758 5.758a2 2 0 010 2.828l-5.758 5.758zM9 10.314l5.172 5.172"></path></svg>
+                } @else if (actividad.nombre.toLowerCase().includes('tenis')) {
+                     <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 11.428a8.001 8.001 0 00-11.314-11.314A8.001 8.001 0 002.8 14.828a8.001 8.001 0 0011.314 11.314 8.001 8.001 0 004.314-14.714zM14.121 14.121a2 2 0 11-2.828-2.828 2 2 0 012.828 2.828z"></path></svg>
+                } @else {
+                     <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                }
+            </div>
+            <h3 class="text-xl font-semibold text-gray-800 dark:text-white">{{ actividad.nombre }}</h3>
+            <p class="mt-1 text-gray-500 dark:text-gray-400 text-sm">{{ actividad.horario }}</p>
+            <p class="mt-4 text-2xl font-bold text-blue-600 dark:text-blue-400">${{ actividad.costo }}<span class="text-sm font-normal text-gray-500">/mes</span></p>
+        </div>
+      }
+    </div>
+  </section>
+  
+  <!-- Final CTA -->
+  <section class="container mx-auto px-4">
+    <div class="bg-blue-600 dark:bg-blue-800 rounded-xl shadow-lg p-8 md:p-12 text-center text-white">
+        <h2 class="text-3xl font-extrabold">¿Listo para Empezar?</h2>
+        <p class="mt-4 text-lg text-blue-100 max-w-2xl mx-auto">
+            Forma parte de nuestra historia. Haz clic en el botón de abajo para iniciar tu proceso de inscripción y descubrir todo lo que El Globo tiene para ofrecerte.
+        </p>
+        <div class="mt-8">
+            <a routerLink="/login" class="px-8 py-3 bg-white text-blue-600 font-semibold rounded-lg hover:bg-gray-100 shadow-md transition-transform transform hover:scale-105">
+                Inscribirse Ahora
+            </a>
+        </div>
+    </div>
+  </section>
+
+</div>

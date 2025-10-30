@@ -1,0 +1,145 @@
+<div class="animate-fade-in">
+  @if (cobrador(); as cobrador) {
+    <header class="mb-8">
+      <h1 class="text-4xl font-bold text-gray-800 dark:text-white">Hola, {{ cobrador.nombreCompleto.split(' ')[0] }}!</h1>
+      <p class="text-gray-600 dark:text-gray-400 mt-1">Bienvenido a tu portal de gestión de cobranzas.</p>
+    </header>
+
+    <!-- Stats -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+      <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Recaudado</p>
+          <p class="text-3xl font-bold text-gray-800 dark:text-white mt-1">${{ estadisticas().totalRecaudado | number:'1.2-2' }}</p>
+        </div>
+        <div class="bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 rounded-full p-3">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+        </div>
+      </div>
+      <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Comisión Ganada</p>
+          <p class="text-3xl font-bold text-gray-800 dark:text-white mt-1">${{ estadisticas().comisionGanada | number:'1.2-2' }}</p>
+        </div>
+        <div class="bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-400 rounded-full p-3">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01"></path></svg>
+        </div>
+      </div>
+      <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Cobranzas Pendientes</p>
+          <p class="text-3xl font-bold text-gray-800 dark:text-white mt-1">{{ estadisticas().cobranzasPendientes }}</p>
+        </div>
+        <div class="bg-yellow-100 dark:bg-yellow-900/50 text-yellow-600 dark:text-yellow-400 rounded-full p-3">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Main Content: Tables -->
+    <div class="grid grid-cols-1 gap-8">
+      <!-- Member List -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg">
+        <div class="p-6 border-b dark:border-gray-700">
+          <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Lista de Socios Asignados</h3>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-300">
+              <tr>
+                <th scope="col" class="px-6 py-3">Socio</th>
+                <th scope="col" class="px-6 py-3">Importe a Cobrar</th>
+                <th scope="col" class="px-6 py-3">Estado del Cupón</th>
+                <th scope="col" class="px-6 py-3 text-center">Acción</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of listaSociosCobranza(); track item.idSocio) {
+                <tr class="bg-white dark:bg-gray-800 border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                  <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">{{ item.nombreSocio }}</td>
+                  <td class="px-6 py-4 font-mono">
+                    @if (item.ultimoCupon) {
+                      ${{ item.ultimoCupon.importeTotal | number:'1.2-2' }}
+                    } @else {
+                      -
+                    }
+                  </td>
+                  <td class="px-6 py-4">
+                    @if (item.ultimoCupon; as cupon) {
+                      <span class="text-xs font-medium px-2.5 py-1 rounded-full"
+                        [class.bg-green-100]="cupon.estado === 'Pagado'" [class.text-green-800]="cupon.estado === 'Pagado'" [class.dark:bg-green-900]="cupon.estado === 'Pagado'" [class.dark:text-green-300]="cupon.estado === 'Pagado'"
+                        [class.bg-yellow-100]="cupon.estado === 'Impago'" [class.text-yellow-800]="cupon.estado === 'Impago'" [class.dark:bg-yellow-900]="cupon.estado === 'Impago'" [class.dark:text-yellow-300]="cupon.estado === 'Impago'"
+                        [class.bg-red-100]="cupon.estado === 'Vencido'" [class.text-red-800]="cupon.estado === 'Vencido'" [class.dark:bg-red-900]="cupon.estado === 'Vencido'" [class.dark:text-red-300]="cupon.estado === 'Vencido'">
+                        {{ cupon.estado }}
+                      </span>
+                    } @else {
+                      <span class="text-xs font-medium px-2.5 py-1 rounded-full bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-300">
+                        Sin Cupón
+                      </span>
+                    }
+                  </td>
+                  <td class="px-6 py-4 text-center">
+                    @if (item.ultimoCupon && (item.ultimoCupon.estado === 'Impago' || item.ultimoCupon.estado === 'Vencido')) {
+                      <button (click)="registrarPago(item.ultimoCupon.id)" class="font-medium text-green-600 dark:text-green-500 hover:underline">Registrar Pago</button>
+                    } @else if (item.ultimoCupon?.estado === 'Pagado') {
+                      <span class="font-medium text-green-600 dark:text-green-400 flex items-center justify-center">
+                        <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Cobrado
+                      </span>
+                    } @else {
+                      <span class="text-gray-400 dark:text-gray-500">-</span>
+                    }
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="4" class="px-6 py-10 text-center text-gray-500 dark:text-gray-400">
+                    <p class="font-semibold">No hay socios asignados a sus zonas de cobranza.</p>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Pagos Recientes -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg">
+        <div class="p-6 border-b dark:border-gray-700">
+          <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Historial de Pagos Recientes</h3>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-300">
+              <tr>
+                <th scope="col" class="px-6 py-3">Fecha</th>
+                <th scope="col" class="px-6 py-3">Importe</th>
+                <th scope="col" class="px-6 py-3">Comisión</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (pago of pagosRecientes(); track pago.id) {
+                <tr class="bg-white dark:bg-gray-800 border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                  <td class="px-6 py-4">{{ pago.fechaPago }}</td>
+                  <td class="px-6 py-4 font-mono font-medium text-gray-900 dark:text-white">${{ pago.importePagado | number:'1.2-2' }}</td>
+                  <td class="px-6 py-4 font-mono text-green-600">+${{ pago.comisionCobrador | number:'1.2-2' }}</td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="3" class="px-6 py-10 text-center text-gray-500 dark:text-gray-400">No has registrado ningún pago todavía.</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  } @else {
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 text-center">
+      <h1 class="text-2xl font-bold text-red-600 dark:text-red-400">Error al Cargar Datos</h1>
+      <p class="mt-4 text-gray-600 dark:text-gray-300">
+        No se pudieron cargar los datos del cobrador. Por favor, intente iniciar sesión nuevamente.
+      </p>
+    </div>
+  }
+</div>

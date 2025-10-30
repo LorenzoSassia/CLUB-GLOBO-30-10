@@ -1,0 +1,208 @@
+<div class="container mx-auto animate-fade-in">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h3 class="text-2xl font-semibold text-gray-700 dark:text-gray-200">Gestión de Casilleros</h3>
+            <p class="text-gray-500 dark:text-gray-400 mt-1">Asigne, libere, edite o elimine los casilleros del club.</p>
+        </div>
+        <button (click)="abrirModalCRUD(null)" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-5 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center space-x-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+            <span>Nuevo Casillero</span>
+        </button>
+    </div>
+
+    <!-- Grid de Casilleros -->
+    <div class="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 gap-4">
+        @for(casillero of casilleros(); track casillero.id) {
+            <div class="border-2 rounded-lg flex flex-col overflow-hidden transition-all duration-200"
+                [class.border-green-400]="casillero.estado === 'Disponible'"
+                [class.bg-green-100]="casillero.estado === 'Disponible'"
+                [class.dark:bg-green-900/50]="casillero.estado === 'Disponible'"
+                [class.border-yellow-400]="casillero.estado === 'Ocupado'"
+                [class.bg-yellow-100]="casillero.estado === 'Ocupado'"
+                [class.dark:bg-yellow-900/50]="casillero.estado === 'Ocupado'"
+                [class.border-gray-400]="casillero.estado === 'Mantenimiento'"
+                [class.bg-gray-200]="casillero.estado === 'Mantenimiento'"
+                [class.dark:bg-gray-700]="casillero.estado === 'Mantenimiento'">
+                <div 
+                    (click)="gestionarCasillero(casillero)"
+                    [class.cursor-pointer]="casillero.estado !== 'Mantenimiento'"
+                    [class.cursor-not-allowed]="casillero.estado === 'Mantenimiento'"
+                    [class.hover:bg-green-200]="casillero.estado === 'Disponible'"
+                    [class.dark:hover:bg-green-800]="casillero.estado === 'Disponible'"
+                    [class.hover:bg-yellow-200]="casillero.estado === 'Ocupado'"
+                    [class.dark:hover:bg-yellow-800]="casillero.estado === 'Ocupado'"
+                    class="aspect-square flex-1 flex flex-col items-center justify-center">
+                    <span class="font-bold text-lg dark:text-white">{{ casillero.nroCasillero }}</span>
+                    @switch(casillero.estado) {
+                        @case('Disponible') { <span class="text-xs text-green-700 dark:text-green-300">Libre</span> }
+                        @case('Ocupado') { <span class="text-xs text-yellow-700 dark:text-yellow-300">Ocupado</span> }
+                        @case('Mantenimiento') { <span class="text-xs text-gray-600 dark:text-gray-400">Mantenimiento</span> }
+                    }
+                </div>
+                 <!-- Actions bar -->
+                <div class="p-1 bg-gray-200/50 dark:bg-black/20 flex justify-end space-x-1">
+                    <button (click)="abrirModalCRUD(casillero)" title="Editar" class="p-1 rounded text-blue-600 hover:bg-blue-200 dark:text-blue-400 dark:hover:bg-gray-600">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5L15.232 5.232z"></path></svg>
+                    </button>
+                    <button (click)="iniciarEliminacion(casillero)" [disabled]="casillero.estado === 'Ocupado'" title="Eliminar" class="p-1 rounded text-red-600 hover:bg-red-200 dark:text-red-400 dark:hover:bg-gray-600 disabled:text-gray-400 disabled:cursor-not-allowed disabled:hover:bg-transparent">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    </button>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Assign/Release Modal -->
+@if (modalGestionAbierto() && casilleroSeleccionado(); as casillero) {
+  <div class="fixed inset-0 bg-black bg-opacity-60 z-40 flex items-center justify-center p-4" (click)="cerrarModalGestion()">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md" (click)="$event.stopPropagation()">
+      <div class="px-6 py-4 border-b dark:border-gray-700 flex justify-between items-center">
+        <h3 class="text-xl font-semibold text-gray-800 dark:text-white">
+          @switch (modoModalGestion()) {
+            @case ('asignar') { Asignar Casillero N° {{ casillero.nroCasillero }} }
+            @case ('ver_ocupado') { 
+              @if (confirmandoLiberacion()) {
+                Confirmar Liberación
+              } @else {
+                Gestionar Casillero N° {{ casillero.nroCasillero }} 
+              }
+            }
+          }
+        </h3>
+        <button (click)="cerrarModalGestion()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+      </div>
+
+      @switch (modoModalGestion()) {
+        @case ('asignar') {
+          <div class="p-6">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Seleccionar Socio</label>
+            <select [(ngModel)]="idSocioParaAsignar" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:ring-blue-500 focus:border-blue-500">
+              <option [ngValue]="null" disabled>Seleccione un socio sin casillero...</option>
+              @for (socio of sociosDisponibles(); track socio.id) {
+                <option [ngValue]="socio.id">{{ socio.nombre }} {{ socio.apellido }} (ID: {{ socio.id }})</option>
+              }
+              @if(sociosDisponibles().length === 0) {
+                 <option [ngValue]="null" disabled>No hay socios sin casillero asignado.</option>
+              }
+            </select>
+          </div>
+          <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 flex justify-end space-x-3 rounded-b-lg">
+            <button type="button" (click)="cerrarModalGestion()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500">Cancelar</button>
+            <button (click)="asignarCasillero()" [disabled]="!idSocioParaAsignar()" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-blue-300 dark:disabled:bg-blue-400 disabled:cursor-not-allowed">Asignar</button>
+          </div>
+        }
+        @case ('ver_ocupado') {
+          @if (!confirmandoLiberacion()) {
+            <div class="p-6">
+              <p class="text-sm text-gray-500 dark:text-gray-400">Actualmente ocupado por:</p>
+              <p class="text-lg font-semibold text-gray-800 dark:text-white mt-1">{{ casillero.nombreSocio }}</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-4">Costo del alquiler: ${{ casillero.montoMensual }}/mes</p>
+            </div>
+            <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 flex justify-end rounded-b-lg">
+              <button (click)="iniciarLiberacion()" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">Liberar Casillero</button>
+            </div>
+          } @else {
+            <div class="p-6">
+              <p class="mt-2 text-gray-600 dark:text-gray-300">
+                  ¿Está seguro que desea liberar el casillero N° <strong>{{ casillero.nroCasillero }}</strong>, que está asignado a <strong>{{ casillero.nombreSocio }}</strong>?
+              </p>
+              <p class="mt-2 text-sm text-yellow-600 dark:text-yellow-400">Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 flex justify-end space-x-3 rounded-b-lg">
+                <button (click)="cancelarLiberacion()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500">
+                    Cancelar
+                </button>
+                <button (click)="confirmarLiberacion()" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">
+                    Sí, Liberar
+                </button>
+            </div>
+          }
+        }
+      }
+    </div>
+  </div>
+}
+
+<!-- Add/Edit Modal -->
+@if (modalCRUDAbierto()) {
+    <div class="fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center" (click)="cerrarModalCRUD()">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-lg m-4" (click)="$event.stopPropagation()">
+            <form [formGroup]="formularioCasillero" (ngSubmit)="guardarCasillero()">
+                <div class="px-6 py-4 border-b dark:border-gray-700">
+                    <h3 class="text-xl font-semibold text-gray-800 dark:text-white">{{ casilleroEditando() ? 'Editar Casillero N° ' + casilleroEditando()?.nroCasillero : 'Nuevo Casillero' }}</h3>
+                </div>
+                <div class="p-6 space-y-4">
+                    <div>
+                        <label for="nroCasillero" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Número de Casillero</label>
+                        <input id="nroCasillero" type="number" formControlName="nroCasillero" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 disabled:bg-gray-200 dark:disabled:bg-gray-600">
+                    </div>
+                    <div>
+                        <label for="montoMensual" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Costo Mensual de Alquiler</label>
+                        <input id="montoMensual" type="number" formControlName="montoMensual" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+                    </div>
+                     <div>
+                        <label for="estado" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Estado</label>
+                        @if (casilleroEditando()?.estado === 'Ocupado') {
+                            <p class="mt-1 text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 p-2 rounded-md">Ocupado (liberar primero para cambiar estado)</p>
+                        } @else {
+                           <select id="estado" formControlName="estado" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+                                <option value="Disponible">Disponible</option>
+                                <option value="Mantenimiento">Mantenimiento</option>
+                            </select>
+                        }
+                    </div>
+                </div>
+                <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 flex justify-end space-x-3 rounded-b-lg">
+                    <button type="button" (click)="cerrarModalCRUD()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500">Cancelar</button>
+                    <button type="submit" [disabled]="formularioCasillero.invalid" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-blue-300 dark:disabled:bg-blue-400 disabled:cursor-not-allowed">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+}
+
+<!-- Delete Confirmation Modal -->
+@if (modalEliminarAbierto() && casilleroParaEliminar(); as casillero) {
+  <div class="fixed inset-0 bg-black bg-opacity-60 z-40" (click)="cancelarEliminacion()"></div>
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md" (click)="$event.stopPropagation()">
+      <div class="p-6 text-center">
+        <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900/50">
+          <svg class="h-6 w-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+          </svg>
+        </div>
+        <h3 class="mt-5 text-lg font-medium text-gray-900 dark:text-white">Eliminar Casillero</h3>
+        <div class="mt-2">
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            ¿Está seguro que desea eliminar el casillero <strong class="text-gray-700 dark:text-gray-200">N° {{ casillero.nroCasillero }}</strong>?
+          </p>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Esta acción no se puede deshacer.</p>
+        </div>
+      </div>
+      <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 flex justify-center space-x-3 rounded-b-lg">
+        <button type="button" (click)="cancelarEliminacion()" class="px-4 py-2 w-full bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500">
+          Cancelar
+        </button>
+        <button type="button" (click)="confirmarEliminacion()" class="px-4 py-2 w-full bg-red-600 text-white rounded-md hover:bg-red-700">
+          Sí, Eliminar
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Placeholder mínimo para que el build no falle. Reemplazar por la plantilla real. -->
+<div class="casilleros-root">
+  <h2>Gestión de casilleros</h2>
+  <button (click)="generarCupones()">Generar cupones</button>
+  <div *ngIf="cuponesEnriquecidos.length">
+    <ul>
+      <li *ngFor="let c of cuponesEnriquecidos; trackBy: trackById">{{ c.id }}</li>
+    </ul>
+  </div>
+</div>
