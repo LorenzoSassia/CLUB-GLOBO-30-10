@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AutenticacionService } from '../../services/autenticacion.service';
+import { AuthService } from '../../services/autenticacion.service';
 import { DataService } from '../../services/data.service';
 
 @Component({
@@ -11,7 +11,7 @@ import { DataService } from '../../services/data.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CobradorDashboardComponent {
-  private autenticacionService = inject(AutenticacionService);
+  private autenticacionService = inject(AuthService);
   private dataService = inject(DataService);
 
   cobrador = this.autenticacionService.usuarioActual;

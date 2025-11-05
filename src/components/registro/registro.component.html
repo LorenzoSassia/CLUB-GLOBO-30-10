@@ -1,0 +1,30 @@
+<div class="registro-container">
+  <h2>Registro de usuario</h2>
+
+  <form [formGroup]="formRegistro" (ngSubmit)="onSubmit()">
+
+    <label>Usuario:</label>
+    <input type="text" formControlName="usuario" />
+    <label>Contraseña:</label>
+    <input type="text" formControlName="password" />
+
+    <label>Rol:</label>
+    <select formControlName="rol">
+      <option value="usuario">Usuario</option>
+      <option value="admin">Administrador</option>
+    </select>
+
+    <button type="submit" [disabled]="formRegistro.invalid">Registrar</button>
+  </form>
+
+  @if(exitosMsg){
+    <div class="success-message">
+      {{ exitosMsg }}
+      </div>
+  }
+  @if(errorMsg){
+    <div class="error-message">
+      {{ errorMsg }}
+    </div>
+  }
+</div>

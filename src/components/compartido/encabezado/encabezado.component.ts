@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { ActivationEnd, Router, RouterLink } from '@angular/router';
 import { filter, map } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { AutenticacionService } from '../../../services/autenticacion.service';
+import { AuthService } from '../../../services/autenticacion.service';
 
 @Component({
   selector: 'app-encabezado',
@@ -49,7 +49,7 @@ import { AutenticacionService } from '../../../services/autenticacion.service';
 })
 export class EncabezadoComponent {
   private router = inject(Router);
-  private autenticacionService = inject(AutenticacionService);
+  private autenticacionService = inject(AuthService);
 
   pageTitle = toSignal(
     this.router.events.pipe(

@@ -2,7 +2,7 @@
 import { Routes } from '@angular/router';
 import { InvitadoComponent } from './components/invitado/invitado.component';
 import { LoginComponent } from './components/login/login.component';
-import { autenticacionGuard } from './guards/autenticacion.guard';
+import { authGuard } from './guards/autenticacion.guard';
 
 // Paneles de Roles
 import { DashboardComponent } from './components/dashboard/dashboard.component';
@@ -23,7 +23,7 @@ export const APP_ROUTES: Routes = [
   // Rutas Protegidas por Rol
   {
     path: 'panel',
-    canActivate: [autenticacionGuard],
+    canActivate: [authGuard],
     data: { rol: 'Administrador' },
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -38,14 +38,14 @@ export const APP_ROUTES: Routes = [
   { 
     path: 'portal-socio',
     component: SocioDashboardComponent,
-    canActivate: [autenticacionGuard],
+    canActivate: [authGuard],
     data: { rol: 'Socio' },
     title: 'Portal del Socio'
   },
   { 
     path: 'portal-cobrador', 
     component: CobradorDashboardComponent,
-    canActivate: [autenticacionGuard],
+    canActivate: [authGuard],
     data: { rol: 'Cobrador' },
     title: 'Portal del Cobrador'
   },

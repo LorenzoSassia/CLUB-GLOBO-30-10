@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AutenticacionService } from '../../services/autenticacion.service';
+import { AuthService } from '../../services/autenticacion.service';
 import { DataService } from '../../services/data.service';
 import { Casillero } from '../../models/models';
 
@@ -12,7 +12,7 @@ import { Casillero } from '../../models/models';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SocioDashboardComponent {
-  private autenticacionService = inject(AutenticacionService);
+  private autenticacionService = inject(AuthService);
   private dataService = inject(DataService);
 
   usuario = this.autenticacionService.usuarioActual;

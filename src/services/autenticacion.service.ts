@@ -1,76 +1,63 @@
-import { Injectable, signal, inject } from '@angular/core';
-import { Router } from '@angular/router';
-import { Usuario, Rol } from '../models/models';
-import { DataService } from './data.service';
+// src/app/services/auth.service.ts
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { tap, catchError, of } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { RespuestaLogin } from '../components/interfaces/respuesta-login';
+
 
 @Injectable({
   providedIn: 'root'
 })
-export class AutenticacionService {
-  private dataService = inject(DataService);
-  private router = inject(Router);
-  private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:3000/api/auth';
+export class AuthService {
+  private URL = 'http://localhost:3000/api/auth';
+  private usuarioActualSubject = new BehaviorSubject<RespuestaLogin | null>(null);
 
-  usuarioActual = signal<Usuario | null>(null);
+  usuarioActual = this.usuarioActualSubject.asObservable();
 
-  constructor() {
-    const usuarioGuardado = localStorage.getItem('usuarioActual');
-    if (usuarioGuardado) {
-      this.usuarioActual.set(JSON.parse(usuarioGuardado));
+  constructor(private http: HttpClient) {
+    const guardado = localStorage.getItem('usuario');
+    if (guardado) {
+      this.usuarioActualSubject.next(JSON.parse(guardado));
     }
   }
-  
+
+  registrar(datos: { usuario: string; contrasena: string; rol: string }): Observable<any> {
+    return this.http.post(`${this.URL}/registro`, datos);
+  }
+
+  login(usuario: string, contrasena: string): Observable<RespuestaLogin> {
+    return this.http.post<RespuestaLogin>(`${this.URL}/login`, { usuario, contrasena })
+    .pipe(
+      tap(res => {
+        localStorage.setItem('usuario', JSON.stringify(res)); // guardo toda la respuesta del login
+        localStorage.setItem('token', res.token);             // token aparte
+        this.usuarioActualSubject.next(res);
+      })
+
+    );
+  }
+
+  logout() {
+    localStorage.removeItem('usuario');
+    localStorage.removeItem('token');
+    this.usuarioActualSubject.next(null);
+  }
+
   getToken(): string | null {
-    return localStorage.getItem('authToken');
+    return localStorage.getItem('token');
   }
 
-  login(nombreUsuario: string, contrasena: string) {
-    return this.http.post<{ token: string }>(`${this.apiUrl}/login`, { usuario: nombreUsuario, password: contrasena })
-      .pipe(
-        tap(response => {
-          localStorage.setItem('authToken', response.token);
-          
-          // Decode token to get user info (basic decoding, no verification needed here)
-          const payload = JSON.parse(atob(response.token.split('.')[1]));
-          const usuario: Usuario = {
-            id: payload.id,
-            nombreUsuario: payload.usuario,
-            rol: payload.rol,
-            contrasena: '', // not stored
-            nombreCompleto: '', // This will be enriched by DataService later
-            idSocio: payload.idSocio 
-          };
-          
-          const enrichedUser = this.dataService.usuarios().find(u => u.nombreUsuario === usuario.nombreUsuario);
-          
-          if(enrichedUser) {
-              this.usuarioActual.set(enrichedUser);
-              localStorage.setItem('usuarioActual', JSON.stringify(enrichedUser));
-          }
-
-        }),
-        catchError(error => {
-          console.error('Login failed:', error);
-          return of(null); // Return a null observable on error
-        })
-      );
+  getRol(): string | null {
+    const usuario = localStorage.getItem('usuario');
+    return usuario ? JSON.parse(usuario).rol : null;
   }
 
-  logout(): void {
-    this.usuarioActual.set(null);
-    localStorage.removeItem('usuarioActual');
-    localStorage.removeItem('authToken');
-    this.router.navigate(['/invitado']);
+  getUsuario(): string | null {
+    return localStorage.getItem('usuario');
   }
 
-  estaAutenticado(): boolean {
+  estaLogueado(): boolean {
     return !!this.getToken();
-  }
-
-  tieneRol(rolRequerido: Rol): boolean {
-    return this.usuarioActual()?.rol === rolRequerido;
   }
 }
