@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/autenticacion.service';
 import { DataService } from '../../services/data.service';
 import { Casillero } from '../../models/models';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-socio-dashboard',
@@ -15,7 +16,8 @@ export class SocioDashboardComponent {
   private autenticacionService = inject(AuthService);
   private dataService = inject(DataService);
 
-  usuario = this.autenticacionService.usuarioActual;
+ 
+   usuario = toSignal(this.autenticacionService.usuarioActual);
 
   // Modal state
   actividadParaBaja = signal<{id: number, nombre: string} | null>(null);
@@ -27,7 +29,7 @@ export class SocioDashboardComponent {
   // Enriched data for the socio's view
   datosSocio = computed(() => {
     const usuarioActual = this.usuario();
-    if (!usuarioActual || !usuarioActual.idSocio) {
+    if (!usuarioActual || !usuarioActual.usuario.idSocio) {
       return {
         socio: null,
         categoria: null,
@@ -38,7 +40,7 @@ export class SocioDashboardComponent {
       };
     }
 
-    const socio = this.dataService.socios().find(s => s.id === usuarioActual.idSocio);
+    const socio = this.dataService.socios().find(s => s.id === usuarioActual.usuario.idSocio);
     if (!socio) {
       return {
         socio: null,

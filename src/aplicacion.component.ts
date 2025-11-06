@@ -5,6 +5,7 @@ import { EncabezadoComponent } from './components/compartido/encabezado/encabeza
 import { AuthService } from './services/autenticacion.service';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-root',
@@ -18,6 +19,9 @@ export class AplicacionComponent {
   autenticacionService = inject(AuthService);
   
   titulo = 'Club El Globo Management System';
+  usuario = toSignal(this.autenticacionService.usuarioActual);
 
-  esAdmin = computed(() => this.autenticacionService.usuarioActual()?.rol === 'Administrador');
+  esAdmin(): boolean {
+    return this.usuario()?.usuario.rol === 'Administrador';
+}
 }

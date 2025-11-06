@@ -21,7 +21,7 @@ import { AuthService } from '../../../services/autenticacion.service';
 
           <!-- User Info & Logout -->
           <div>
-            @if (usuario(); as user) {
+            @if (usuario | async; as user) {
               <div class="flex items-center space-x-4">
                 <div class="flex flex-col items-end">
                     <span class="font-medium text-gray-800 dark:text-gray-200">{{ user.nombreCompleto }}</span>

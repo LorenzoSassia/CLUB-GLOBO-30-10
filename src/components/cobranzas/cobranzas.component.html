@@ -27,7 +27,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @for (cupon of cuponesEnriquecidos(); track cupon.id) {
+                    @for (cupon of cuponesEnriquecidos; track cupon.id) {
                     <tr class="bg-white dark:bg-gray-800 border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
                         <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">{{ cupon.nombreSocio }} (N° {{cupon.idSocio}})</td>
                         <td class="px-6 py-4">{{ cupon.mes }}/{{ cupon.anio }}</td>

@@ -2,6 +2,7 @@ import { Component, ChangeDetectionStrategy, computed, inject } from '@angular/c
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/autenticacion.service';
 import { DataService } from '../../services/data.service';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-cobrador-dashboard',
@@ -14,7 +15,7 @@ export class CobradorDashboardComponent {
   private autenticacionService = inject(AuthService);
   private dataService = inject(DataService);
 
-  cobrador = this.autenticacionService.usuarioActual;
+  cobrador = toSignal(this.autenticacionService.usuarioActual);
 
   // Central computed signal for all view data
   private vistaCobrador = computed(() => {
@@ -28,7 +29,7 @@ export class CobradorDashboardComponent {
     }
 
     // FIX: Find the cobrador record to get their ID for filtering.
-    const cobradorInfo = this.dataService.cobradores().find(c => c.nombre === cobradorActual.nombreCompleto);
+    const cobradorInfo = this.dataService.cobradores().find(c => c.nombre === cobradorActual.usuario.nombreCompleto);
     const cobradorId = cobradorInfo?.id;
 
     const todasLasCobranzas = this.dataService.cobranzas();
@@ -104,7 +105,7 @@ export class CobradorDashboardComponent {
   registrarPago(idCobranza: number) {
     const cobradorActual = this.cobrador();
     // FIX: Find the cobrador's numeric ID to pass to the service.
-    const cobradorInfo = this.dataService.cobradores().find(c => c.nombre === cobradorActual?.nombreCompleto);
+    const cobradorInfo = this.dataService.cobradores().find(c => c.nombre === cobradorActual?.usuario.nombreCompleto);
     if (cobradorInfo) {
       this.dataService.registrarPago(idCobranza, cobradorInfo.id);
     } else {

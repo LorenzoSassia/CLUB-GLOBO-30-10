@@ -1,5 +1,5 @@
 <div class="animate-fade-in">
-  @if (cobrador(); as cobrador) {
+  @if (cobrador | async; as cobrador) {
     <header class="mb-8">
       <h1 class="text-4xl font-bold text-gray-800 dark:text-white">Hola, {{ cobrador.nombreCompleto.split(' ')[0] }}!</h1>
       <p class="text-gray-600 dark:text-gray-400 mt-1">Bienvenido a tu portal de gestión de cobranzas.</p>
