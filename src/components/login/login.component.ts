@@ -45,13 +45,13 @@ export class LoginComponent {
         if (responresponse) {
           const rol = responresponse.usuario.rol;
           switch (rol) {
-            case 'Administrador':
+            case 'admin':
               this.router.navigate(['/panel']);
               break;
-            case 'Socio':
+            case 'socio':
               this.router.navigate(['/portal-socio']);
               break;
-            case 'Cobrador':
+            case 'cobrador':
               this.router.navigate(['/portal-cobrador']);
               break;
             default:
