@@ -1,9 +1,10 @@
-// src/app/services/auth.service.ts
+// src/services/auth.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { RespuestaLogin } from '../components/interfaces/respuesta-login';
+// Asegúrate que esta ruta sea correcta
+import { RespuestaLogin } from '../components/interfaces/respuesta-login'; 
 
 
 @Injectable({
@@ -31,10 +32,9 @@ export class AuthService {
     .pipe(
       tap(res => {
         localStorage.setItem('usuario', JSON.stringify(res)); // guardo toda la respuesta del login
-        localStorage.setItem('token', res.token);             // token aparte
+        localStorage.setItem('token', res.token);           // token aparte
         this.usuarioActualSubject.next(res);
       })
-
     );
   }
 
@@ -48,13 +48,26 @@ export class AuthService {
     return localStorage.getItem('token');
   }
 
+  /**
+   * ¡CORREGIDO!
+   * Obtiene el ROL desde el objeto anidado 'usuario' en localStorage.
+   */
   getRol(): string | null {
-    const usuario = localStorage.getItem('usuario');
-    return usuario ? JSON.parse(usuario).rol : null;
+    const usuarioString = localStorage.getItem('usuario');
+    if (!usuarioString) return null;
+    
+    const respuesta: RespuestaLogin = JSON.parse(usuarioString);
+    // El rol está en respuesta.usuario.rol, no en respuesta.rol
+    return respuesta.usuario ? respuesta.usuario.rol : null;
   }
 
-  getUsuario(): string | null {
-    return localStorage.getItem('usuario');
+  /**
+   * Obtiene el objeto de usuario COMPLETO guardado en localStorage.
+   * (Nombre de función corregido para mayor claridad).
+   */
+  getUsuarioLogueado(): RespuestaLogin | null {
+    const usuario = localStorage.getItem('usuario');
+    return usuario ? JSON.parse(usuario) : null;
   }
 
   estaLogueado(): boolean {
