@@ -1,3 +1,4 @@
+//import { Usuario } from './models';
 // Defines the data models used throughout the application.
 
 export type Rol = 'Administrador' | 'Socio' | 'Cobrador';
@@ -38,6 +39,14 @@ export interface Actividad {
   nombre: string;
   costo: number;
   turno: string; // e.g., "Mañana", "Tarde", "Mañana - Tarde"
+}
+
+export interface nombreUsuario {
+  id: number;
+  usuario: string;
+  contrasena: string;
+  rol: Rol;
+  idSocio?: number;
 }
 
 export interface Casillero {

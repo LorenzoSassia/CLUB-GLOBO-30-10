@@ -1,3 +1,5 @@
+<!-- socios.component.html-->
+
 <div class="container mx-auto animate-fade-in">
   <!-- Header -->
   <div class="flex justify-between items-center mb-6">
@@ -142,9 +144,13 @@
             <label for="fechaNacimiento" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Fecha de Nacimiento</label>
             <input type="date" id="fechaNacimiento" formControlName="fechaNacimiento" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:ring-blue-500 focus:border-blue-500">
           </div>
-          <div class="md:col-span-2">
+          <div>
             <label for="direccion" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Dirección</label>
             <input type="text" id="direccion" formControlName="direccion" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:ring-blue-500 focus:border-blue-500">
+          </div>
+          <div>
+            <label for="idCasillero" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Número de casillero</label>
+            <input type="text" id="idCasillero" formControlName="idCasillero" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:ring-blue-500 focus:border-blue-500">
           </div>
            <div>
             <label for="telefono" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Teléfono</label>
@@ -173,7 +179,7 @@
       </form>
       <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 flex justify-end space-x-3 rounded-b-lg">
         <button type="button" (click)="cerrarModal()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500">Cancelar</button>
-        <button type="button" (click)="guardarSocio()" [disabled]="formularioSocio.invalid" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-blue-300 dark:disabled:bg-blue-400 disabled:cursor-not-allowed">Guardar Socio</button>
+        <button type="button" (click)="guardarSocio()" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-blue-300 dark:disabled:bg-blue-400 disabled:cursor-not-allowed">Guardar Socio</button>
       </div>
     </div>
   </div>

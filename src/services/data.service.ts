@@ -1,3 +1,5 @@
+//data.service.ts
+
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { forkJoin, tap } from 'rxjs';
@@ -86,6 +88,7 @@ export class DataService {
   // --- API Methods ---
   private loadInitialData(): void {
     forkJoin({
+      usuarios: this.http.get<any[]>(`${this.baseUrl}/usuarios`),
       categorias: this.http.get<any[]>(`${this.baseUrl}/categorias`),
       socios: this.http.get<any[]>(`${this.baseUrl}/socios`),
       actividades: this.http.get<any[]>(`${this.baseUrl}/actividades`),
@@ -93,6 +96,7 @@ export class DataService {
       cobradores: this.http.get<any[]>(`${this.baseUrl}/cobradores`),
       cobranzas: this.http.get<any[]>(`${this.baseUrl}/cobranzas`)
     }).subscribe(data => {
+      this._usuarios.set(convertKeys(data.usuarios, snakeToCamel));
       this._categorias.set(convertKeys(data.categorias, snakeToCamel));
       this._socios.set(convertKeys(data.socios, snakeToCamel));
       this._actividades.set(convertKeys(data.actividades, snakeToCamel));
@@ -107,7 +111,7 @@ export class DataService {
 
   addSocio(socio: Omit<Socio, 'id'>): void {
     const payload = convertKeys(socio, camelToSnake);
-    this.http.post<{ id: number }>(`${this.baseUrl}/socios`, payload)
+    this.http.post<{ id: number }>(`${this.baseUrl}/socios`, socio)
       .subscribe(response => {
         const nuevoSocio = { ...socio, id: response.id };
         this._socios.update(socios => [...socios, nuevoSocio]);
@@ -116,7 +120,7 @@ export class DataService {
 
   updateSocio(socioActualizado: Socio): void {
     const payload = convertKeys(socioActualizado, camelToSnake);
-    this.http.put(`${this.baseUrl}/socios/${socioActualizado.id}`, payload)
+    this.http.put(`${this.baseUrl}/socios/${socioActualizado.id}`, socioActualizado)
       .subscribe(() => {
         this._socios.update(socios => socios.map(s => s.id === socioActualizado.id ? socioActualizado : s));
       });
@@ -149,6 +153,29 @@ export class DataService {
     this.http.delete(`${this.baseUrl}/actividades/${id}`)
       .subscribe(() => {
         this._actividades.update(actividades => actividades.filter(a => a.id !== id));
+      });
+  }
+
+  addUsuario(usuario: Omit<Usuario, 'id'>): void {
+    this.http.post<{ id: number }>(`${this.baseUrl}/usuarios`, usuario)
+      .subscribe(response => {
+        this._usuarios.update(usuarios => [...usuarios, { ...usuario, id: response.id }]);
+      });
+  }
+
+  updateUsuario(usuarioActualizado: Usuario): void {
+    this.http.put(`${this.baseUrl}/usuarios/${usuarioActualizado.id}`, usuarioActualizado)
+      .subscribe(() => {
+        this._usuarios.update(usuarios => 
+          usuarios.map(a => a.id === usuarioActualizado.id ? usuarioActualizado : a)
+        );
+      });
+  }
+  
+  deleteUsuario(id: number): void {
+    this.http.delete(`${this.baseUrl}/usuarios/${id}`)
+      .subscribe(() => {
+        this._usuarios.update(usuarios => usuarios.filter(a => a.id !== id));
       });
   }
   
@@ -258,7 +285,7 @@ export class DataService {
     this._socioActividades.set(socioActividades);
 
     // This is also static as the auth API doesn't provide user details beyond id/role.
-    const usuarios: Usuario[] = [
+    /*const usuarios: Usuario[] = [
        { id: 1, nombreUsuario: 'jose', contrasena: '123456', nombreCompleto: 'Ricardo Darin', rol: 'Socio', idSocio: 3 },
        { id: 2, nombreUsuario: 'admin', contrasena: '654321', nombreCompleto: 'Administrador', rol: 'Administrador' },
        { id: 3, nombreUsuario: 'jperez', contrasena: '1234', nombreCompleto: 'Juan Perez', rol: 'Socio', idSocio: 1 },
@@ -268,3 +295,4 @@ export class DataService {
     this._usuarios.set(usuarios);
   }
 }
+*/  }}
