@@ -1,0 +1,107 @@
+<div class="container mx-auto animate-fade-in">
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-800 dark:text-white">Gestión de Cobradores</h1>
+      <p class="text-gray-500 dark:text-gray-400 mt-1">Administre el personal de cobranzas del club.</p>
+    </div>
+    <button (click)="abrirModal(null)" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-5 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center space-x-2">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+      <span>Nuevo Cobrador</span>
+    </button>
+  </div>
+
+  <!-- Table -->
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-300">
+          <tr>
+            <th scope="col" class="px-6 py-3">ID</th>
+            <th scope="col" class="px-6 py-3">Nombre</th>
+            <th scope="col" class="px-6 py-3">Zona</th>
+            <th scope="col" class="px-6 py-3 text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (cobrador of cobradores(); track cobrador.id) {
+            <tr class="bg-white dark:bg-gray-800 border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+              <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">{{ cobrador.id }}</td>
+              <td class="px-6 py-4 font-medium text-gray-800 dark:text-gray-200">{{ cobrador.nombre }}</td>
+              <td class="px-6 py-4">{{ cobrador.zona }}</td>
+              <td class="px-6 py-4 text-right">
+                <button (click)="abrirModal(cobrador)" class="font-medium text-blue-600 dark:text-blue-500 hover:underline mr-4">Editar</button>
+                <button (click)="iniciarEliminacion(cobrador)" class="font-medium text-red-600 dark:text-red-500 hover:underline">Eliminar</button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+                <td colspan="4" class="px-6 py-12 text-center text-gray-500">
+                    <p class="text-lg">No se encontraron cobradores.</p>
+                </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for Add/Edit Cobrador -->
+@if (modalAbierto()) {
+  <div class="fixed inset-0 bg-black bg-opacity-60 z-40" (click)="cerrarModal()"></div>
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-lg" (click)="$event.stopPropagation()">
+      <div class="px-6 py-4 border-b dark:border-gray-700">
+        <h2 class="text-xl font-semibold text-gray-800 dark:text-white">{{ cobradorEditando() ? 'Editar Cobrador' : 'Nuevo Cobrador' }}</h2>
+      </div>
+      <form [formGroup]="formularioCobrador" (ngSubmit)="guardarCobrador()" class="p-6">
+        <div class="space-y-4">
+          <div>
+            <label for="nombre" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre</label>
+            <input type="text" id="nombre" formControlName="nombre" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:ring-blue-500 focus:border-blue-500">
+          </div>
+          <div>
+            <label for="zona" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Zona</label>
+            <input type="text" id="zona" formControlName="zona" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:ring-blue-500 focus:border-blue-500">
+          </div>
+        </div>
+      </form>
+      <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 flex justify-end space-x-3 rounded-b-lg">
+        <button type="button" (click)="cerrarModal()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500">Cancelar</button>
+        <button type="button" (click)="guardarCobrador()" [disabled]="formularioCobrador.invalid" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-blue-300 dark:disabled:bg-blue-400 disabled:cursor-not-allowed">Guardar Cobrador</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal for Delete Confirmation -->
+@if (modalEliminarAbierto() && cobradorParaEliminar(); as cobrador) {
+  <div class="fixed inset-0 bg-black bg-opacity-60 z-40" (click)="cancelarEliminacion()"></div>
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md" (click)="$event.stopPropagation()">
+      <div class="p-6 text-center">
+        <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900/50">
+          <svg class="h-6 w-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+          </svg>
+        </div>
+        <h3 class="mt-5 text-lg font-medium text-gray-900 dark:text-white">Eliminar Cobrador</h3>
+        <div class="mt-2">
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            ¿Está seguro que desea eliminar a <strong class="text-gray-700 dark:text-gray-200">{{ cobrador.nombre }}</strong>?
+          </p>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Esta acción no se puede deshacer.</p>
+        </div>
+      </div>
+      <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 flex justify-center space-x-3 rounded-b-lg">
+        <button type="button" (click)="cancelarEliminacion()" class="px-4 py-2 w-full bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500">
+          Cancelar
+        </button>
+        <button type="button" (click)="confirmarEliminacion()" class="px-4 py-2 w-full bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+          Sí, Eliminar
+        </button>
+      </div>
+    </div>
+  </div>
+}

@@ -108,7 +108,7 @@ export class DataService {
       this.cargarDatosEstaticos();
     });
   }
-
+  // ---------------------------------------------------------------------------------------------------------------------------------------------------
   addSocio(socio: Omit<Socio, 'id'>): void {
     const payload = convertKeys(socio, camelToSnake);
     this.http.post<{ id: number }>(`${this.baseUrl}/socios`, socio)
@@ -133,6 +133,7 @@ export class DataService {
       });
   }
 
+  // ---------------------------------------------------------------------------------------------------------------------------------------------------
   addActividad(actividad: Omit<Actividad, 'id'>): void {
     this.http.post<{ id: number }>(`${this.baseUrl}/actividades`, actividad)
       .subscribe(response => {
@@ -156,6 +157,7 @@ export class DataService {
       });
   }
 
+  // ---------------------------------------------------------------------------------------------------------------------------------------------------
   addUsuario(usuario: Omit<Usuario, 'id'>): void {
     this.http.post<{ id: number }>(`${this.baseUrl}/usuarios`, usuario)
       .subscribe(response => {
@@ -178,7 +180,33 @@ export class DataService {
         this._usuarios.update(usuarios => usuarios.filter(a => a.id !== id));
       });
   }
-  
+
+ // ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+  addCobrador(cobrador: Omit<Cobrador, 'id'>): void {
+    this.http.post<{ id: number }>(`${this.baseUrl}/cobradores`, cobrador)
+      .subscribe(response => {
+        this._cobradores.update(cobradors => [...cobradors, { ...cobrador, id: response.id }]);
+      });
+  }
+
+  updateCobrador(cobradorActualizado: Cobrador): void {
+    this.http.put(`${this.baseUrl}/cobradores/${cobradorActualizado.id}`, cobradorActualizado)
+      .subscribe(() => {
+        this._cobradores.update(cobradores => 
+          cobradores.map(a => a.id === cobradorActualizado.id ? cobradorActualizado : a)
+        );
+      });
+  }
+
+   deleteCobrador(id: number): void {
+    this.http.delete(`${this.baseUrl}/cobradores/${id}`)
+      .subscribe(() => {
+        this._cobradores.update(cobradores => cobradores.filter(a => a.id !== id));
+      });
+  }
+  // ---------------------------------------------------------------------------------------------------------------------------------------------------
   addCasillero(casillero: Omit<Casillero, 'id' | 'estado' | 'idSocio'>): void {
     const payload = { ...convertKeys(casillero, camelToSnake), estado: 'Disponible' };
     this.http.post<{ id: number }>(`${this.baseUrl}/casilleros`, payload)

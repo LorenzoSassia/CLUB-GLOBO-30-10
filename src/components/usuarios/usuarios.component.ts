@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { DataService } from '../../services/data.service'; 
@@ -18,6 +18,7 @@ export class UsuariosComponent {
   usuarios = this.dataService.usuarios;
   roles = ['admin', 'socio', 'cobrador'];
   socios = this.dataService.socios;
+  cobradores = this.dataService.cobradores;
  
   
   modalAbierto = signal(false);
@@ -31,8 +32,54 @@ export class UsuariosComponent {
     // Lo dejamos opcional para que no rompa el HTML si existe, pero no lo usaremos
     nombreCompleto: [''], 
     rol: ['socio', Validators.required],
-    idSocio: [null as number | null] 
+    idSocio: [null as number | null], 
+    idCobrador: [null as number | null]
   });
+
+  sociosDisponibles = computed(() => {
+    const sociosVinculados = new Set(this.usuarios().filter(u => u.idSocio).map(u => u.idSocio));
+    const socioEditando = this.usuarioEditando();
+    if (socioEditando && socioEditando.idSocio) {
+        sociosVinculados.delete(socioEditando.idSocio);
+    }
+    return this.socios().filter(s => !sociosVinculados.has(s.id));
+  });
+
+  cobradoresDisponibles = computed(() => {
+    const cobradoresVinculados = new Set(this.usuarios().filter(u => u.idCobrador).map(u => u.idCobrador));
+    const usuarioEditando = this.usuarioEditando();
+    if (usuarioEditando && usuarioEditando.idCobrador) {
+        cobradoresVinculados.delete(usuarioEditando.idCobrador);
+    }
+    return this.cobradores().filter(c => !cobradoresVinculados.has(c.id));
+  });
+
+  constructor() {
+    effect(() => {
+      const rol = this.formularioUsuario.get('rol')?.value;
+      const idSocioControl = this.formularioUsuario.get('idSocio');
+      const idCobradorControl = this.formularioUsuario.get('idCobrador');
+      
+      // Lógica para Socio
+      if (rol === 'Socio') {
+        idSocioControl?.setValidators(Validators.required);
+      } else {
+        idSocioControl?.clearValidators();
+        idSocioControl?.setValue(null, { emitEvent: false });
+      }
+      idSocioControl?.updateValueAndValidity({ emitEvent: false });
+      
+      // Lógica para Cobrador
+      if (rol === 'Cobrador') {
+        idCobradorControl?.setValidators(Validators.required);
+      } else {
+        idCobradorControl?.clearValidators();
+        idCobradorControl?.setValue(null, { emitEvent: false });
+      }
+      idCobradorControl?.updateValueAndValidity({ emitEvent: false });
+    });
+  }
+
 
   abrirModal(usuario: Usuario | null) {
     this.usuarioEditando.set(usuario);
@@ -42,11 +89,16 @@ export class UsuariosComponent {
         // Usamos string vacío si no viene nada
         nombreCompleto: usuario.nombreCompleto || '',
         rol: usuario.rol,
-        idSocio: usuario.idSocio
+        idSocio: usuario.idSocio ?? null,
+        idCobrador: usuario.idCobrador ?? null
       });
       this.formularioUsuario.controls['contrasena'].removeValidators(Validators.required);
     } else {
-      this.formularioUsuario.reset({ rol: 'Socio' });
+      this.formularioUsuario.reset({
+        rol: 'Socio',
+        idSocio: null,
+        idCobrador: null
+      });
       this.formularioUsuario.controls['contrasena'].addValidators(Validators.required);
     }
     this.formularioUsuario.controls['contrasena'].updateValueAndValidity();
@@ -72,7 +124,8 @@ export class UsuariosComponent {
         usuario: formVal.nombreUsuario!, 
         rol: rolValido,
         // No enviamos nombreCompleto
-        idSocio: formVal.idSocio || undefined
+        idSocio: formVal.idSocio || undefined,
+        idCobrador: formVal.idCobrador || undefined,
       };
       this.dataService.updateUsuario(usuarioActualizado);
     } else {
@@ -82,7 +135,8 @@ export class UsuariosComponent {
         contrasena: formVal.contrasena!,
         rol: rolValido,
         // No enviamos nombreCompleto
-        idSocio: formVal.idSocio || undefined
+        idSocio: formVal.idSocio || undefined,
+        idCobrador: formVal.idCobrador || undefined,
       };
       this.dataService.addUsuario(nuevoUsuario);
     }

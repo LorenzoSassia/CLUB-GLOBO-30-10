@@ -20,8 +20,8 @@
             <th scope="col" class="px-6 py-3">ID</th>
             <th scope="col" class="px-6 py-3">Usuario</th>
             <th scope="col" class="px-10 py-3">Rol</th>
-            <th scope="col" class="px-6 py-3">Socio Vinculado</th>
-            <th scope="col" class="px-6 py-3 text-right">Acciones</th>
+            <!--<th scope="col" class="px-6 py-3">Socio Vinculado</th> -->
+            <th scope="col" class="px-16 py-3 text-right">Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -39,7 +39,7 @@
                 </span>
               </td>
               <td class="px-6 py-4">{{ usuario.nombreSocio }}</td>
-              <td class="px-4 py-4 text-right">
+              <td class="px-2 py-4 text-left">
                 <button (click)="abrirModal(usuario)" class="font-medium text-blue-600 dark:text-blue-500 hover:underline mr-4">Editar</button>
                 @if (usuario.id !== 2) {
                     <button (click)="iniciarEliminacion(usuario)" class="font-medium text-red-600 dark:text-red-500 hover:underline">Eliminar</button>
@@ -100,6 +100,18 @@
                 </select>
              </div>
           }
+
+          @if (formularioUsuario.get('rol')?.value === 'cobrador') {
+             <div class="animate-fade-in">
+                <label for="idCobrador" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Vincular Cobrador</label>
+                <select id="idCobrador" formControlName="idCobrador" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:ring-blue-500 focus:border-blue-500">
+                    <option [ngValue]="null" disabled>Seleccione un cobrador...</option>
+                    @for (cobrador of cobradores(); track cobrador.id) { <option [value]="cobrador.id">{{ cobrador.nombre }} {{ cobrador.apellido }}</option> }
+                </select>
+             </div>
+          }
+
+          
         </div>
       </form>
       <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 flex justify-end space-x-3 rounded-b-lg">

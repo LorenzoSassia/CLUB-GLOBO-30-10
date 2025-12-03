@@ -10,6 +10,7 @@ export interface Usuario {
   nombreCompleto: string;
   rol: Rol;
   idSocio?: number; // Link to a Socio if the role is 'Socio'
+  idCobrador?: number; 
 }
 
 export interface Categoria {

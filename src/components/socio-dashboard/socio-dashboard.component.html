@@ -23,7 +23,7 @@
               <p><strong>Email:</strong> {{ s.email }}</p>
               <p><strong>Teléfono:</strong> {{ s.telefono }}</p>
               <p><strong>Categoría:</strong> {{ categoria()?.nombre || 'N/A' }}</p>
-              <p><strong>Antigüedad:</strong> {{ s.antiguedad }} años</p>
+              <!--<p><strong>Antigüedad:</strong> {{ s.antiguedad }} años</p> -->
               <div class="flex items-center">
                 <strong class="mr-2">Estado:</strong> 
                 <span class="font-semibold px-2 py-1 text-sm rounded-full" [class.text-red-800]="s.moroso" [class.bg-red-100]="s.moroso" [class.dark:text-red-200]="s.moroso" [class.dark:bg-red-900/50]="s.moroso" [class.text-green-800]="!s.moroso" [class.bg-green-100]="!s.moroso" [class.dark:text-green-200]="!s.moroso" [class.dark:bg-green-900/50]="!s.moroso">
@@ -32,7 +32,7 @@
               </div>
             </div>
           </div>
-          <!-- Locker Card -->
+          <!-- Locker Card 
           <div class="bg-gray-50 dark:bg-gray-800/50 p-6 rounded-xl shadow">
             <div class="flex items-center space-x-3 border-b border-gray-200 dark:border-gray-700 pb-3 mb-4">
               <div class="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 rounded-full p-2">
@@ -52,7 +52,7 @@
                 Ver Casilleros Disponibles
               </button>
             }
-          </div>
+          </div>-->
         </div>
 
         <!-- Right Column: Coupons & Activities -->
