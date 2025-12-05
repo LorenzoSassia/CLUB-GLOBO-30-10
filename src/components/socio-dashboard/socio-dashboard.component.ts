@@ -15,9 +15,11 @@ import { toSignal } from '@angular/core/rxjs-interop';
 export class SocioDashboardComponent {
   private autenticacionService = inject(AuthService);
   private dataService = inject(DataService);
+  
+  socioActividad = this.dataService.socioActividades;
 
  
-   usuario = toSignal(this.autenticacionService.usuarioActual);
+  usuario = toSignal(this.autenticacionService.usuarioActual);
 
   // Modal state
   actividadParaBaja = signal<{id: number, nombre: string} | null>(null);
@@ -34,7 +36,6 @@ export class SocioDashboardComponent {
         socio: null,
         categoria: null,
         casillero: null,
-        // FIX: Rename to cobranzas to match the new model.
         cobranzas: [],
         actividadesInscritoIds: new Set<number>(),
       };

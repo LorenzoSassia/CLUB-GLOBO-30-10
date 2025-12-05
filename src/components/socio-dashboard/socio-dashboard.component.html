@@ -76,17 +76,17 @@
                   </tr>
                 </thead>
                 <tbody>
-                  @for (cupon of cupones(); track cupon.id) {
+                  @for (cobranza of cobranzas(); track cobranza.id) {
                     <tr class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700/50">
-                      <td class="px-6 py-4 font-medium text-gray-800 dark:text-gray-200">{{ cupon.mes }}/{{ cupon.anio }}</td>
-                      <td class="px-6 py-4">{{ cupon.fechaVencimiento | date:'dd/MM/yyyy' }}</td>
-                      <td class="px-6 py-4 text-right font-mono text-gray-800 dark:text-gray-200">{{ cupon.importeTotal | currency:'':'$':'1.2-2' }}</td>
+                      <td class="px-6 py-4 font-medium text-gray-800 dark:text-gray-200">{{ cobranza.mes }}</td>
+                      <td class="px-6 py-4">{{ cobranza.fecha_emision }}</td>
+                      <td class="px-6 py-4 text-right font-mono text-gray-800 dark:text-gray-200">{{ cobranza.monto | currency:'':'$':'1.2-2' }}</td>
                       <td class="px-6 py-4 text-center">
                         <span class="px-2.5 py-1 text-xs font-semibold rounded-full"
-                          [class.bg-green-100]="cupon.estado === 'Pagado'" [class.text-green-800]="cupon.estado === 'Pagado'" [class.dark:bg-green-900/50]="cupon.estado === 'Pagado'" [class.dark:text-green-300]="cupon.estado === 'Pagado'"
-                          [class.bg-red-100]="cupon.estado === 'Vencido'" [class.text-red-800]="cupon.estado === 'Vencido'" [class.dark:bg-red-900/50]="cupon.estado === 'Vencido'" [class.dark:text-red-300]="cupon.estado === 'Vencido'"
-                          [class.bg-yellow-100]="cupon.estado === 'Impago'" [class.text-yellow-800]="cupon.estado === 'Impago'" [class.dark:bg-yellow-900/50]="cupon.estado === 'Impago'" [class.dark:text-yellow-300]="cupon.estado === 'Impago'">
-                          {{ cupon.estado }}
+                          [class.bg-green-100]="cobranza.estado === 'Pagado'" [class.text-green-800]="cobranza.estado === 'Pagado'" [class.dark:bg-green-900/50]="cobranza.estado === 'Pagado'" [class.dark:text-green-300]="cobranza.estado === 'Pagado'"
+                          [class.bg-red-100]="cobranza.estado === 'Vencido'" [class.text-red-800]="cobranza.estado === 'Vencido'" [class.dark:bg-red-900/50]="cobranza.estado === 'Vencido'" [class.dark:text-red-300]="cobranza.estado === 'Vencido'"
+                          [class.bg-yellow-100]="cobranza.estado === 'Impago'" [class.text-yellow-800]="cobranza.estado === 'Impago'" [class.dark:bg-yellow-900/50]="cobranza.estado === 'Impago'" [class.dark:text-yellow-300]="cobranza.estado === 'Impago'">
+                          {{ cobranza.estado }}
                         </span>
                       </td>
                     </tr>

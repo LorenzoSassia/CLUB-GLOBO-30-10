@@ -3,6 +3,7 @@ export interface UsuarioLogueado {
   usuario: string;    // El login (ej: "jperez")
   rol: string;
   idSocio?: number;  // ID de la tabla de socios (si aplica)
+  idCobrador?: number;  // ID de la tabla de cobradores (si aplica)
   nombreCompleto?: string; // "Juan Perez" (si aplica)
 }
 

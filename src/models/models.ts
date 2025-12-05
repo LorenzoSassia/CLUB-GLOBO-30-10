@@ -48,6 +48,7 @@ export interface nombreUsuario {
   contrasena: string;
   rol: Rol;
   idSocio?: number;
+  idCobrador?: number;
 }
 
 export interface Casillero {
@@ -85,4 +86,6 @@ export interface Cobranza {
   estado: 'Pago' | 'Impago' | 'Vencido'; // Enriched from DB's "Pago"
   recargo: number | null;
   descuento: number;
+  nombreSocio: string;
+  nombreCobrador: string;
 }
