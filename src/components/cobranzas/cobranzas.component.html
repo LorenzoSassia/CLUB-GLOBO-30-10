@@ -1,58 +1,160 @@
-
 <div class="container mx-auto animate-fade-in">
-    <!-- Header -->
-    <div class="flex justify-between items-center mb-6">
-        <div>
-            <h3 class="text-2xl font-semibold text-gray-700 dark:text-gray-200">Generación de Cupones y Cobranzas</h3>
-            <p class="text-gray-500 dark:text-gray-400 mt-1">Emita cupones mensuales y controle la morosidad.</p>
-        </div>
-        <button (click)="generarCupones()" class="px-6 py-2.5 bg-green-600 text-white font-medium text-sm rounded-lg hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-green-300 transition-all duration-300 ease-in-out shadow-md hover:shadow-lg flex items-center">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h5M5 5a9 9 0 0014 0M19 9h5V4M19 19a9 9 0 00-14 0"></path></svg>
-            Generar Cupones Mensuales
-        </button>
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-800 dark:text-white">Gestión de Cobranzas</h1>
+      <p class="text-gray-500 dark:text-gray-400 mt-1">Administre los registros de facturación del club.</p>
     </div>
+    <button (click)="abrirModal(null)" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-5 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center space-x-2">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+      <span>Nueva Cobranza</span>
+    </button>
+  </div>
 
-    <!-- Table -->
-     <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
-        <div class="overflow-x-auto">
-            <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                    <tr>
-                        <th scope="col" class="px-6 py-3">Socio</th>
-                        <th scope="col" class="px-6 py-3">Período</th>
-                        <th scope="col" class="px-6 py-3">Vencimiento</th>
-                        <th scope="col" class="px-6 py-3">Importe</th>
-                        <th scope="col" class="px-6 py-3">Estado</th>
-                        <th scope="col" class="px-6 py-3 text-right">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @for (cupon of cuponesEnriquecidos; track cupon.id) {
-                    <tr class="bg-white dark:bg-gray-800 border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                        <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">{{ cupon.nombreSocio }} (N° {{cupon.idSocio}})</td>
-                        <td class="px-6 py-4">{{ cupon.mes }}/{{ cupon.anio }}</td>
-                        <td class="px-6 py-4">{{ cupon.fechaVencimiento }}</td>
-                        <td class="px-6 py-4">${{ cupon.importeTotal }}</td>
-                        <td class="px-6 py-4">
-                            @if(cupon.estado === 'Pagado') {
-                                <span class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">Pagado</span>
-                            } @else if (cupon.estado === 'Impago') {
-                                <span class="px-2 py-1 text-xs font-semibold text-yellow-800 bg-yellow-100 rounded-full">Impago</span>
-                            } @else {
-                                <span class="px-2 py-1 text-xs font-semibold text-red-800 bg-red-100 rounded-full">Vencido</span>
-                            }
-                        </td>
-                        <td class="px-6 py-4 text-right">
-                           @if(cupon.estado !== 'Pagado') {
-                                <button (click)="reemitirConRecargo(cupon)" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Re-emitir con 5%</button>
-                           } @else {
-                                <span class="text-gray-400 dark:text-gray-500">-</span>
-                           }
-                        </td>
-                    </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
+  <!-- Table -->
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-300">
+          <tr>
+            <th scope="col" class="px-6 py-3">Socio</th>
+            <th scope="col" class="px-6 py-3">Cobrador</th>
+            <th scope="col" class="px-6 py-3">Período</th>
+            <th scope="col" class="px-6 py-3">Emisión</th>
+            <th scope="col" class="px-6 py-3 text-right">Monto Total</th>
+            <th scope="col" class="px-6 py-3">Estado</th>
+            <th scope="col" class="px-6 py-3 text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (cobranza of cobranzasEnriquecidas(); track cobranza.id) {
+            <tr class="bg-white dark:bg-gray-800 border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+              <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">{{ cobranza.nombreSocio }}</td>
+              <td class="px-6 py-4">{{ cobranza.nombreCobrador }}</td>
+              <td class="px-6 py-4">{{ cobranza.mes }} / {{ cobranza.fechaEmision | date:'yyyy' }}</td>
+              <td class="px-6 py-4">{{ cobranza.fechaEmision | date:'dd/MM/yyyy' }}</td>
+              <td class="px-6 py-4 text-right font-mono text-gray-800 dark:text-gray-200">${{ (cobranza.monto + ((cobranza.monto * cobranza.recargo / 100) || 0) - (cobranza.monto * cobranza.descuento / 100)) | number:'1.2-2' }}</td>
+              <td class="px-6 py-4">
+                <span class="px-2.5 py-1 text-xs font-semibold rounded-full"
+                  [class.bg-green-100]="cobranza.estado === 'Pago'" [class.text-green-800]="cobranza.estado === 'Pago'" [class.dark:bg-green-900]="cobranza.estado === 'Pago'" [class.dark:text-green-300]="cobranza.estado === 'Pago'"
+                  [class.bg-yellow-100]="cobranza.estado === 'Impago'" [class.text-yellow-800]="cobranza.estado === 'Impago'" [class.dark:bg-yellow-900]="cobranza.estado === 'Impago'" [class.dark:text-yellow-300]="cobranza.estado === 'Impago'"
+                  [class.bg-red-100]="cobranza.estado === 'Vencido'" [class.text-red-800]="cobranza.estado === 'Vencido'" [class.dark:bg-red-900]="cobranza.estado === 'Vencido'" [class.dark:text-red-300]="cobranza.estado === 'Vencido'">
+                  {{ cobranza.estado }}
+                </span>
+              </td>
+              <td class="px-6 py-4 text-right">
+                <button (click)="abrirModal(cobranza)" class="font-medium text-blue-600 dark:text-blue-500 hover:underline mr-4">Editar</button>
+                <button (click)="iniciarEliminacion(cobranza)" class="font-medium text-red-600 dark:text-red-500 hover:underline">Eliminar</button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="7" class="px-6 py-12 text-center text-gray-500">
+                <p class="text-lg">No se encontraron cobranzas.</p>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
     </div>
+  </div>
 </div>
+
+<!-- Modal for Add/Edit Cobranza -->
+@if (modalAbierto()) {
+  <div class="fixed inset-0 bg-black bg-opacity-60 z-40" (click)="cerrarModal()"></div>
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col" (click)="$event.stopPropagation()">
+      <div class="px-6 py-4 border-b dark:border-gray-700">
+        <h2 class="text-xl font-semibold text-gray-800 dark:text-white">{{ cobranzaEditanda() ? 'Editar Cobranza' : 'Nueva Cobranza' }}</h2>
+      </div>
+      <form [formGroup]="formularioCobranza" (ngSubmit)="guardarCobranza()" class="flex-1 overflow-y-auto p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          <div class="md:col-span-2">
+            <label for="idSocio" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Socio</label>
+            <select id="idSocio" formControlName="idSocio" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:ring-blue-500 focus:border-blue-500">
+              <option [ngValue]="null" disabled>Seleccione un socio...</option>
+              @for (socio of socios(); track socio.id) { <option [value]="socio.id">{{ socio.nombre }} {{ socio.apellido }}</option> }
+            </select>
+          </div>
+          
+          <div>
+            <label for="idCobrador" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Cobrador Asignado</label>
+            <select id="idCobrador" formControlName="idCobrador" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:ring-blue-500 focus:border-blue-500">
+              <option [ngValue]="null" disabled>Seleccione un cobrador...</option>
+              @for (cobrador of cobradores(); track cobrador.id) { <option [value]="cobrador.id">{{ cobrador.nombre }}</option> }
+            </select>
+          </div>
+
+          <div>
+            <label for="estado" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Estado</label>
+            <select id="estado" formControlName="estado" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:ring-blue-500 focus:border-blue-500">
+              <option value="Impago">Impago</option>
+              <option value="Pago">Pago</option>
+              <option value="Vencido">Vencido</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="mes" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Mes de Facturación</label>
+            <input type="text" id="mes" formControlName="mes" placeholder="Ej: Junio" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:ring-blue-500 focus:border-blue-500">
+          </div>
+
+          <div>
+            <label for="fechaEmision" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Fecha de Emisión</label>
+            <input type="date" id="fechaEmision" formControlName="fechaEmision" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:ring-blue-500 focus:border-blue-500">
+          </div>
+
+          <div>
+            <label for="monto" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Monto Base</label>
+            <input type="number" id="monto" formControlName="monto" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:ring-blue-500 focus:border-blue-500">
+          </div>
+          <div>
+            <label for="recargo" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Recargo</label>
+            <input type="number" id="recargo" formControlName="recargo" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:ring-blue-500 focus:border-blue-500">
+          </div>
+           <div>
+            <label for="descuento" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Descuento</label>
+            <input type="number" id="descuento" formControlName="descuento" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:ring-blue-500 focus:border-blue-500">
+          </div>
+        </div>
+      </form>
+      <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 flex justify-end space-x-3 rounded-b-lg">
+        <button type="button" (click)="cerrarModal()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500">Cancelar</button>
+        <button type="button" (click)="guardarCobranza()" [disabled]="formularioCobranza.invalid" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-blue-300 dark:disabled:bg-blue-400 disabled:cursor-not-allowed">Guardar Cobranza</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal for Delete Confirmation -->
+@if (modalEliminarAbierto() && cobranzaParaEliminar(); as cobranza) {
+  <div class="fixed inset-0 bg-black bg-opacity-60 z-40" (click)="cancelarEliminacion()"></div>
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md" (click)="$event.stopPropagation()">
+      <div class="p-6 text-center">
+        <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900/50">
+          <svg class="h-6 w-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+          </svg>
+        </div>
+        <h3 class="mt-5 text-lg font-medium text-gray-900 dark:text-white">Eliminar Cobranza</h3>
+        <div class="mt-2">
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            ¿Está seguro que desea eliminar la cobranza para <strong class="text-gray-700 dark:text-gray-200">{{ cobranza.nombreSocio }}</strong> del período <strong class="text-gray-700 dark:text-gray-200">{{cobranza.mes}}</strong>?
+          </p>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Esta acción no se puede deshacer.</p>
+        </div>
+      </div>
+      <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 flex justify-center space-x-3 rounded-b-lg">
+        <button type="button" (click)="cancelarEliminacion()" class="px-4 py-2 w-full bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500">
+          Cancelar
+        </button>
+        <button type="button" (click)="confirmarEliminacion()" class="px-4 py-2 w-full bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+          Sí, Eliminar
+        </button>
+      </div>
+    </div>
+  </div>
+}

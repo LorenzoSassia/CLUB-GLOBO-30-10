@@ -206,6 +206,33 @@ export class DataService {
         this._cobradores.update(cobradores => cobradores.filter(a => a.id !== id));
       });
   }
+
+  
+  // ---------------------------------------------------------------------------------------------------------------------------------------------------
+   
+   addCobranza(cobranza: Omit<Cobranza, 'id'>): void {
+    this.http.post<{ id: number }>(`${this.baseUrl}/cobranzas`, cobranza)
+      .subscribe(response => {
+        this._cobranzas.update(cobranzas => [...cobranzas, { ...cobranza, id: response.id }]);
+      });
+  }
+
+  updateCobranza(cobranzaActualizado: Cobranza): void {
+    this.http.put(`${this.baseUrl}/cobranzas/${cobranzaActualizado.id}`, cobranzaActualizado)
+      .subscribe(() => {
+        this._cobranzas.update(cobranzas => 
+          cobranzas.map(a => a.id === cobranzaActualizado.id ? cobranzaActualizado : a)
+        );
+      });
+  }
+
+   deleteCobranza(id: number): void {
+    this.http.delete(`${this.baseUrl}/cobranzas/${id}`)
+      .subscribe(() => {
+        this._cobranzas.update(cobranzas => cobranzas.filter(a => a.id !== id));
+      });
+  } 
+
   // ---------------------------------------------------------------------------------------------------------------------------------------------------
   addCasillero(casillero: Omit<Casillero, 'id' | 'estado' | 'idSocio'>): void {
     const payload = { ...convertKeys(casillero, camelToSnake), estado: 'Disponible' };

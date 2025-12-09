@@ -1,63 +1,182 @@
-import { Component, ChangeDetectionStrategy, computed, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
-// FIX: Correct service name and path to DataService and data.service.ts
-import { DataService } from '../../services/data.service';
-// FIX: Import the correct 'Cobranza' model as 'CuponCobranza' is obsolete.
+import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { DataService } from '../../services/data.service'; 
 import { Cobranza } from '../../models/models';
 
 @Component({
   selector: 'app-cobranzas',
-  // FIX: Make component standalone as it's loaded via routing.
   standalone: true,
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './cobranzas.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule]
 })
 export class CobranzasComponent {
-  // FIX: Inject DataService instead of DatosService
   private dataService = inject(DataService);
-
-  // FIX: Use 'cobranzas' signal from DataService as 'cupones' is obsolete.
-  cobranzas = this.dataService.cobranzas;
+  private fb: FormBuilder = inject(FormBuilder);
+  
+  cobranza = this.dataService.cobranzas;
   socios = this.dataService.socios;
+  cobradores = this.dataService.cobradores;
+ 
   
-  // FIX: Rename to 'cobranzasEnriquecidas' and update logic to work with the 'Cobranza' model.
-  cobranzasEnriquecidas = computed(() => {
-      const allCobranzas = this.cobranzas();
-      const allSocios = this.socios();
-      return allCobranzas.map(cobranza => {
-          const socio = allSocios.find(s => s.id === cobranza.idSocio);
-          return {
-              ...cobranza,
-              // FIX: Use 'socio.nombre' as 'apellido' does not exist on the Socio model.
-              nombreSocio: socio ? socio.nombre : 'Socio no encontrado'
-          };
-      // FIX: Sort by 'fechaEmision' as 'anio' and 'mes' fields are not available on the new model.
-      }).sort((a,b) => new Date(b.fechaEmision).getTime() - new Date(a.fechaEmision).getTime());
+  modalAbierto = signal(false);
+  cobranzaEditanda = signal<Cobranza | null>(null);
+  modalEliminarAbierto = signal(false);
+  cobranzaParaEliminar = signal<Cobranza | null>(null);
+
+   cobranzasEnriquecidas = computed(() => {
+    const allCobranzas = this.dataService.cobranzas();
+    const sociosMap = new Map(this.socios().map(s => [s.id, `${s.nombre} ${s.apellido}`]));
+    const cobradoresMap = new Map(this.cobradores().map(c => [c.id, c.nombre]));
+    
+    return allCobranzas.map(cobranza => ({
+      ...cobranza,
+      nombreSocio: cobranza.nombreSocio || 'Socio no encontrado',
+      nombreCobrador: cobranza.nombreCobrador || 'Cobrador no encontrado'
+    })).sort((a, b) => new Date(b.fechaEmision).getTime() - new Date(a.fechaEmision).getTime());
   });
-  
-  // FIX: Update confirmation text to reflect the new model name ('cobranzas').
-  generarCobranzas() {
-      if(confirm('Esto generará las cobranzas para el mes actual para todos los socios. ¿Desea continuar?')) {
-          alert('Funcionalidad de generación de cobranzas no implementada en esta demo.');
-          // TODO: Implement logic to iterate through socios, calculate totals and create new Cobranza objects.
+
+  formularioCobranza = this.fb.group({
+    mes: ['', Validators.required],
+    fechaEmision: ['', Validators.required],
+    monto: [0, [Validators.required, Validators.min(0)]],
+    estado: ['Impago' as const, Validators.required],
+    recargo: [0, [Validators.required, Validators.min(0)]],
+    descuento: [0, [Validators.required, Validators.min(0)]],
+    idSocio: [null as number | null], 
+    idCobrador: [null as number | null]
+  });
+
+  /*sociosDisponibles = computed(() => {
+    const sociosVinculados = new Set(this.usuarios().filter(u => u.idSocio).map(u => u.idSocio));
+    const socioEditando = this.usuarioEditando();
+    if (socioEditando && socioEditando.idSocio) {
+        sociosVinculados.delete(socioEditando.idSocio);
+    }
+    return this.socios().filter(s => !sociosVinculados.has(s.id));
+  });
+
+  cobradoresDisponibles = computed(() => {
+    const cobradoresVinculados = new Set(this.usuarios().filter(u => u.idCobrador).map(u => u.idCobrador));
+    const usuarioEditando = this.usuarioEditando();
+    if (usuarioEditando && usuarioEditando.idCobrador) {
+        cobradoresVinculados.delete(usuarioEditando.idCobrador);
+    }
+    return this.cobradores().filter(c => !cobradoresVinculados.has(c.id));
+  });
+  */
+
+  /*constructor() {
+    effect(() => {
+      const idSocioControl = this.formularioCobranza.get('idSocio');
+      const idCobradorControl = this.formularioCobranza.get('idCobrador');
+      
+      // Lógica para Socio
+      if (rol === 'Socio') {
+        idSocioControl?.setValidators(Validators.required);
+      } else {
+        idSocioControl?.clearValidators();
+        idSocioControl?.setValue(null, { emitEvent: false });
       }
-  }
-
-  // FIX: Update method parameter and confirmation text to use 'cobranza' terminology.
-  reemitirConRecargo(cobranza: ReturnType<typeof this.cobranzasEnriquecidas>[number]) {
-      if(confirm(`Re-emitir la cobranza de ${cobranza.nombreSocio} con un 5% de recargo?`)) {
-          alert('Funcionalidad de re-emisión no implementada en esta demo.');
-          // TODO: Update cobranza with 5% surcharge
+      idSocioControl?.updateValueAndValidity({ emitEvent: false });
+      
+      // Lógica para Cobrador
+      if (rol === 'Cobrador') {
+        idCobradorControl?.setValidators(Validators.required);
+      } else {
+        idCobradorControl?.clearValidators();
+        idCobradorControl?.setValue(null, { emitEvent: false });
       }
+      idCobradorControl?.updateValueAndValidity({ emitEvent: false });
+    });
+  }
+*/
+
+  abrirModal(cobranza: Cobranza | null) {
+    this.cobranzaEditanda.set(cobranza);
+    if (cobranza) {
+      this.formularioCobranza.patchValue({
+        mes: cobranza.mes,
+        fechaEmision: cobranza.fechaEmision,
+        monto: cobranza.monto,
+        //estado: cobranza.estado ,
+        recargo: cobranza.recargo,
+        descuento: cobranza.descuento,
+        idSocio: cobranza.idSocio ?? null, 
+        idCobrador: cobranza.idCobrador ?? null
+
+      });
+
+    } else {
+      this.formularioCobranza.reset({
+        idSocio: null,
+        idCobrador: null
+      });
+    }
+    this.modalAbierto.set(true);
   }
 
-  cuponesEnriquecidos: any[] = [];
-
-  generarCupones(): void {
-    // lógica real aquí
-    this.cuponesEnriquecidos = []; 
+  cerrarModal() {
+    this.modalAbierto.set(false);
+    this.cobranzaEditanda.set(null);
   }
 
-  trackById(index: number, item: any) { return item?.id; }
+  guardar() {
+    if (this.formularioCobranza.invalid) return;
+
+    const formVal = this.formularioCobranza.getRawValue();
+    const cobranzaEditanda = this.cobranzaEditanda();
+     
+
+    if (cobranzaEditanda) {
+      // FIX: Usamos 'any' para poder omitir 'nombreCompleto' sin que TypeScript marque error
+      const cobranzaActualizada: any = {
+        ...cobranzaEditanda,
+        mes: formVal.mes!,
+        fechaEmision: formVal.fechaEmision!,
+        monto: formVal.monto!,
+        estado: formVal.estado!,
+        recargo: formVal.recargo!,
+        descuento: formVal.descuento!,
+        idSocio: formVal.idSocio || undefined,
+        idCobrador: formVal.idCobrador || undefined,
+      };
+
+      this.dataService.updateCobranza(cobranzaActualizada);
+    } else {
+      // FIX: Usamos 'any' aquí también para omitir 'nombreCompleto'
+      const nuevaCobranza: any = {
+        mes: formVal.mes!,
+        fechaEmision: formVal.fechaEmision!,
+        monto: formVal.monto!,
+        estado: formVal.estado!,
+        recargo: formVal.recargo!,
+        descuento: formVal.descuento!,
+        idSocio: formVal.idSocio || undefined,
+        idCobrador: formVal.idCobrador || undefined,
+      };
+
+      this.dataService.addCobranza(nuevaCobranza);
+    }
+    this.cerrarModal();
+  }
+
+  iniciarEliminacion(cobranza: Cobranza) {
+    this.cobranzaParaEliminar.set(cobranza);
+    this.modalEliminarAbierto.set(true);
+  }
+
+  cancelarEliminacion() {
+    this.modalEliminarAbierto.set(false);
+    this.cobranzaParaEliminar.set(null);
+  }
+
+  confirmarEliminacion() {
+    const cobranza = this.cobranzaParaEliminar();
+    if (cobranza) {
+      this.dataService.deleteCobranza(cobranza.id);
+      this.cancelarEliminacion();
+    }
+  }
 }
