@@ -1,7 +1,7 @@
 <div class="animate-fade-in">
-  @if (cobrador | async; as cobrador) {
+  @if (cobrador(); as c) {
     <header class="mb-8">
-      <h1 class="text-4xl font-bold text-gray-800 dark:text-white">Hola, {{ cobrador.nombreCompleto.split(' ')[0] }}!</h1>
+      <h1 class="text-4xl font-bold text-gray-800 dark:text-white">Hola, {{ c.nombre.split(' ')[0] }}!</h1>
       <p class="text-gray-600 dark:text-gray-400 mt-1">Bienvenido a tu portal de gestión de cobranzas.</p>
     </header>
 
@@ -103,7 +103,7 @@
         </div>
       </div>
 
-      <!-- Pagos Recientes -->
+      <!-- Pagos Recientes 
       <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg">
         <div class="p-6 border-b dark:border-gray-700">
           <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Historial de Pagos Recientes</h3>
@@ -133,6 +133,7 @@
           </table>
         </div>
       </div>
+    -->
     </div>
   } @else {
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 text-center">

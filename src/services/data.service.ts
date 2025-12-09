@@ -187,7 +187,7 @@ export class DataService {
   addCobrador(cobrador: Omit<Cobrador, 'id'>): void {
     this.http.post<{ id: number }>(`${this.baseUrl}/cobradores`, cobrador)
       .subscribe(response => {
-        this._cobradores.update(cobradors => [...cobradors, { ...cobrador, id: response.id }]);
+        this._cobradores.update(cobradores => [...cobradores, { ...cobrador, id: response.id }]);
       });
   }
 
