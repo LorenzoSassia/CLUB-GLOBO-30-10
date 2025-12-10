@@ -287,8 +287,6 @@ export class DataService {
   }
   
   public registrarPago(idCobranza: number, idCobrador: number): void {
-    // This is a complex operation that should be handled by the backend.
-    // Simulating it on the frontend for now.
     const cobranza = this._cobranzas().find(c => c.id === idCobranza);
     if (!cobranza) return;
 

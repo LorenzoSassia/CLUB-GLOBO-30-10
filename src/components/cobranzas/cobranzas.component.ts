@@ -27,8 +27,8 @@ export class CobranzasComponent {
 
    cobranzasEnriquecidas = computed(() => {
     const allCobranzas = this.dataService.cobranzas();
-    const sociosMap = new Map(this.socios().map(s => [s.id, `${s.nombre} ${s.apellido}`]));
-    const cobradoresMap = new Map(this.cobradores().map(c => [c.id, c.nombre]));
+    //const sociosMap = new Map(this.socios().map(s => [s.id, `${s.nombre} ${s.apellido}`]));
+    //const cobradoresMap = new Map(this.cobradores().map(c => [c.id, c.nombre]));
     
     return allCobranzas.map(cobranza => ({
       ...cobranza,
@@ -122,7 +122,7 @@ export class CobranzasComponent {
     this.cobranzaEditanda.set(null);
   }
 
-  guardar() {
+  guardarCobranza() {
     if (this.formularioCobranza.invalid) return;
 
     const formVal = this.formularioCobranza.getRawValue();

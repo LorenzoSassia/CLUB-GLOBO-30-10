@@ -45,6 +45,7 @@ export class CobradorDashboardComponent {
 
     // FIX: Filter cobranzas by the current cobrador's ID.
     const cobranzasDelCobrador = cobrador ? todasLasCobranzas.filter(c => c.idCobrador === cobrador.id) : [];
+    console.log(`Cobranzas para el cobrador ${cobrador.nombre}:`, cobranzasDelCobrador);
 
     // FIX: Base the list of socios on those with unpaid bills assigned to the cobrador.
     const listaSocios = todosLosSocios
@@ -105,7 +106,8 @@ export class CobradorDashboardComponent {
       cobrador, 
       estadisticas, 
       listaSocios, 
-      pagosRecientes 
+      pagosRecientes,
+      cobranzasDelCobrador
     };
   });
 
@@ -113,17 +115,13 @@ export class CobradorDashboardComponent {
   cobrador = computed(() => this.datosCobrador().cobrador);
   estadisticas = computed(() => this.datosCobrador().estadisticas);
   listaSociosCobranza = computed(() => this.datosCobrador().listaSocios);
-  pagosRecientes = computed(() => this.datosCobrador().pagosRecientes);
+  cobranzasDelCobrador = computed(() => this.datosCobrador().cobranzasDelCobrador);
+  //pagosRecientes = computed(() => this.datosCobrador().pagosRecientes);
 
   // FIX: Parameter renamed to reflect it's a cobranza ID.
   registrarPago(idCobranza: number) {
-    const usuarioActual = this.usuario();
-    // FIX: Find the cobrador's numeric ID to pass to the service.
-    const cobrador = this.dataService.cobradores().find(c => c.nombre === usuarioActual?.usuario.usuario);
-    if (cobrador) {
-      this.dataService.registrarPago(idCobranza, cobrador.id);
-    } else {
-        console.error("No se pudo encontrar el registro del cobrador para registrar el pago.");
-    }
+      const cobranzaActualizado = this.cobranzasDelCobrador().find(c => c.id === idCobranza);
+      cobranzaActualizado.estado = 'Pago';
+      this.dataService.updateCobranza(cobranzaActualizado);
   }
 }
